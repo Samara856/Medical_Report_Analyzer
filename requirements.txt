@@ -3,5 +3,4 @@ pytesseract
 Pillow
 
 Flask==2.3.3
-pytesseract==0.3.11
 Pillow==10.1.0
