@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedAnalyzer - Follow-up Reminders</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafc;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    body.dark-mode {
+      background-color: #1a202c;
+      color: #e2e8f0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      transition: border-color 0.3s;
+    }
+    
+    body.dark-mode header {
+      border-color: #4a5568;
+    }
+    
+    header h1 {
+      color: #1a365d;
+      margin: 0 0 10px 0;
+      font-size: 2rem;
+    }
+    
+    body.dark-mode header h1 {
+      color: #e2e8f0;
+    }
+    
+    header p {
+      color: #4a5568;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    
+    body.dark-mode header p {
+      color: #a0aec0;
+    }
+    
+    .filters {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .filter-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2d3748;
+      font-weight: 600;
+    }
+    
+    body.dark-mode .filter-group label {
+      color: #e2e8f0;
+    }
+    
+    .filter-group select, .filter-group input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    
+    body.dark-mode .filter-group select, body.dark-mode .filter-group input {
+      background-color: #2d3748;
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+    
+    .filter-group select:focus, .filter-group input:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .btn {
+      background: #1a365d;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+    
+    body.dark-mode .btn {
+      background: #3182ce;
+    }
+    
+    .btn:hover {
+      background: #2c5282;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    body.dark-mode .btn:hover {
+      background: #2b6cb0;
+    }
+    
+    .btn-secondary {
+      background: #68d391;
+    }
+    
+    body.dark-mode .btn-secondary {
+      background: #48bb78;
+    }
+    
+    .btn-secondary:hover {
+      background: #48bb78;
+    }
+    
+    body.dark-mode .btn-secondary:hover {
+      background: #38a169;
+    }
+    
+    .reminder-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      transition: border-color 0.3s;
+    }
+    
+    body.dark-mode .reminder-tabs {
+      border-color: #4a5568;
+    }
+    
+    .reminder-tab {
+      padding: 12px 24px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #718096;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .reminder-tab {
+      color: #a0aec0;
+    }
+    
+    .reminder-tab.active {
+      color: #1a365d;
+      border-bottom: 3px solid #60a5fa;
+    }
+    
+    body.dark-mode .reminder-tab.active {
+      color: #60a5fa;
+    }
+    
+    .reminder-tab:hover {
+      color: #4a5568;
+    }
+    
+    body.dark-mode .reminder-tab:hover {
+      color: #e2e8f0;
+    }
+    
+    .reminder-content {
+      display: none;
+    }
+    
+    .reminder-content.active {
+      display: block;
+    }
+    
+    .reminder-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    
+    body.dark-mode .reminder-card {
+      background-color: #2d3748;
+      border-color: #4a5568;
+    }
+    
+    .reminder-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+    
+    .reminder-title {
+      margin: 0;
+      color: #1a365d;
+    }
+    
+    body.dark-mode .reminder-title {
+      color: #e2e8f0;
+    }
+    
+    .reminder-date {
+      color: #718096;
+      font-size: 0.9rem;
+    }
+    
+    body.dark-mode .reminder-date {
+      color: #a0aec0;
+    }
+    
+    .reminder-priority {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .priority-high {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    
+    .priority-medium {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    
+    .priority-low {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+    
+    body.dark-mode .priority-high {
+      background: #7f1d1d;
+      color: #fca5a5;
+    }
+    
+    body.dark-mode .priority-medium {
+      background: #92400e;
+      color: #fde68a;
+    }
+    
+    body.dark-mode .priority-low {
+      background: #15803d;
+      color: #86efac;
+    }
+    
+    .reminder-description {
+      color: #4a5568;
+      margin-bottom: 15px;
+    }
+    
+    body.dark-mode .reminder-description {
+      color: #e2e8f0;
+    }
+    
+    .reminder-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .action-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .complete-btn {
+      background: #10b981;
+      color: white;
+    }
+    
+    .complete-btn:hover {
+      background: #059669;
+    }
+    
+    .snooze-btn {
+      background: #60a5fa;
+      color: white;
+    }
+    
+    .snooze-btn:hover {
+      background: #3b82f6;
+    }
+    
+    .delete-btn {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .delete-btn:hover {
+      background: #dc2626;
+    }
+    
+    .upcoming-reminders {
+      margin-top: 30px;
+    }
+    
+    .upcoming-reminders h3 {
+      color: #1a365d;
+      margin-top: 0;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    body.dark-mode .upcoming-reminders h3 {
+      color: #e2e8f0;
+      border-color: #4a5568;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    
+    body.dark-mode .stat-card {
+      background-color: #2d3748;
+      border-color: #4a5568;
+    }
+    
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #1a365d;
+      margin-bottom: 10px;
+    }
+    
+    body.dark-mode .stat-number {
+      color: #e2e8f0;
+    }
+    
+    .stat-label {
+      color: #4a5568;
+      font-size: 0.9rem;
+    }
+    
+    body.dark-mode .stat-label {
+      color: #a0aec0;
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1a365d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .theme-toggle {
+      background: #2d3748;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      background: #2c5282;
+    }
+    
+    body.dark-mode .theme-toggle:hover {
+      background: #4a5568;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>⏰ Follow-up Reminders</h1>
+      <p>Manage patient follow-up appointments, tests, and medication reviews.</p>
+    </header>
+
+    <div class="filters">
+      <div class="filter-group">
+        <label for="patient">Select Patient</label>
+        <select id="patient">
+          <option value="">All Patients</option>
+          <option value="1">John Smith</option>
+          <option value="2">Jane Doe</option>
+          <option value="3">Robert Johnson</option>
+          <option value="4">Sarah Wilson</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="timeframe">Timeframe</label>
+        <select id="timeframe">
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month" selected>This Month</option>
+          <option value="all">All Reminders</option>
+        </select>
+      </div>
+      
+      <div style="display: flex; align-items: flex-end;">
+        <button class="btn" id="add-reminder">Add New Reminder</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-number">12</div>
+        <div class="stat-label">Overdue</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">8</div>
+        <div class="stat-label">Due This Week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">15</div>
+        <div class="stat-label">Due This Month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">45</div>
+        <div class="stat-label">Total Active</div>
+      </div>
+    </div>
+
+    <div class="reminder-tabs">
+      <div class="reminder-tab active" data-tab="overdue">Overdue</div>
+      <div class="reminder-tab" data-tab="due-soon">Due Soon</div>
+      <div class="reminder-tab" data-tab="scheduled">Scheduled</div>
+      <div class="reminder-tab" data-tab="completed">Completed</div>
+    </div>
+
+    <div id="overdue" class="reminder-content active">
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <h4 class="reminder-title">HbA1c Test</h4>
+          <div>
+            <span class="reminder-date">Due: August 5, 2023</span>
+            <span class="reminder-priority priority-high">High Priority</span>
+          </div>
+        </div>
+        <p class="reminder-description">Patient John Smith requires HbA1c test for diabetes management. Last test was on May 5, 2023 (6.7%). Goal is to monitor progress toward target of <7.0%.</p>
+        <div class="reminder-actions">
+          <button class="action-btn complete-btn">Mark Complete</button>
+          <button class="action-btn snooze-btn">Snooze 7 Days</button>
+          <button class="action-btn delete-btn">Delete</button>
+        </div>
+      </div>
+      
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <h4 class="reminder-title">Lipid Panel</h4>
+          <div>
+            <span class="reminder-date">Due: August 15, 2023</span>
+            <span class="reminder-priority priority-medium">Medium Priority</span>
+          </div>
+        </div>
+        <p class="reminder-description">Patient Robert Johnson requires lipid panel to monitor effectiveness of atorvastatin therapy. Last test showed LDL of 136 mg/dL, goal is <100 mg/dL.</p>
+        <div class="reminder-actions">
+          <button class="action-btn complete-btn">Mark Complete</button>
+          <button class="action-btn snooze-btn">Snooze 7 Days</button>
+          <button class="action-btn delete-btn">Delete</button>
+        </div>
+      </div>
+      
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <h4 class="reminder-title">Follow-up Appointment</h4>
+          <div>
+            <span class="reminder-date">Due: August 20, 2023</span>
+            <span class="reminder-priority priority-high">High Priority</span>
+          </div>
+        </div>
+        <p class="reminder-description">Patient Sarah Wilson scheduled for follow-up regarding hypertension management. Blood pressure has been elevated at home monitoring (150-160/90-95 mmHg).</p>
+        <div class="reminder-actions">
+          <button class="action-btn complete-btn">Mark Complete</button>
+          <button class="action-btn snooze-btn">Snooze 7 Days</button>
+          <button class="action-btn delete-btn">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="due-soon" class="reminder-content">
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <h4 class="reminder-title">Annual Physical</h4>
+          <div>
+            <span class="reminder-date">Due: September 10, 2023</span>
+            <span class="reminder-priority priority-high">High Priority</span>
+          </div>
+        </div>
+        <p class="reminder-description">Patient John Smith due for annual physical examination. Includes comprehensive metabolic panel, lipid panel, CBC, and physical assessment.</p>
+        <div class="reminder-actions">
+          <button class="action-btn complete-btn">Mark Complete</button>
+          <button class="action-btn snooze-btn">Snooze 7 Days</button>
+          <button class="action-btn delete-btn">Delete</button>
+        </div>
+      </div>
+      
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <h4 class="reminder-title">Medication Review</h4>
+          <div>
+            <span class="reminder-date">Due: September 15, 2023</span>
+            <span class="reminder-priority priority-medium">Medium Priority</span>
+          </div>
+        </div>
+        <p class="reminder-description">Patient Jane Doe on multiple medications for hypertension and hyperlipidemia. Schedule medication review to assess adherence and potential interactions.</p>
+        <div class="reminder-actions">
+          <button class="action-btn complete-btn">Mark Complete</button>
+          <button class="action-btn snooze-btn">Snooze 7 Days</button>
+          <button class="action-btn delete-btn">Delete</button>
+        </div>
+      </div>
+      
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <h4 class="reminder-title">Colonoscopy</h4>
+          <div>
+            <span class="reminder-date">Due: September 20, 2023</span>
+            <span class="reminder-priority priority-high">High Priority</span>
+          </div>
+        </div>
+        <p class="reminder-description">Patient Michael Brown due for 5-year follow-up colonoscopy. Previous colonoscopy (2018) showed two small polyps removed.</p>
+        <div class="reminder-actions">
+          <button class="action-btn complete-btn">Mark Complete</button>
+          <button class="action-btn snooze-btn">Snooze 7 Days</button>
+          <button class="action-btn delete-btn">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="scheduled" class="reminder-content">
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <h4 class="reminder-title">Diabetes Education</h4>
+          <div>
+            <span class="reminder-date">Scheduled: October 5, 2023</span>
+            <span class="reminder-priority priority-medium">Medium Priority</span>
+          </div>
+        </div>
+        <p class="reminder-description">Patient John Smith scheduled for diabetes education session with certified diabetes educator. Focus on carbohydrate counting and insulin management.</p>
+        <div class="reminder-actions">
+          <button class="action-btn complete-btn">Mark Complete</button>
+          <button class="action-btn snooze-btn">Snooze 7 Days</button>
+          <button class="action-btn delete-btn">Delete</button>
+        </div>
+      </div>
+      
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <h4 class="reminder-title">Cardiac Stress Test</h4>
+          <div>
+            <span class="reminder-date">Scheduled: October 15, 2023</span>
+            <span class="reminder-priority priority-high">High Priority</span>
+          </div>
+        </div>
+        <p class="reminder-description">Patient Robert Johnson scheduled for cardiac stress test due to new onset chest pain during exercise. Assess for coronary artery disease.</p>
+        <div class="reminder-actions">
+          <button class="action-btn complete-btn">Mark Complete</button>
+          <button class="action-btn snooze-btn">Snooze 7 Days</button>
+          <button class="action-btn delete-btn">Delete</button>
+        </div>
+      </div>
+      
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <h4 class="reminder-title">Vaccination</h4>
+          <div>
+            <span class="reminder-date">Scheduled: November 1, 2023</span>
+            <span class="reminder-priority priority-low">Low Priority</span>
+          </div>
+        </div>
+        <p class="reminder-description">Patient Sarah Wilson scheduled for annual influenza vaccination and pneumococcal booster as per CDC guidelines for patients with chronic conditions.</p>
+        <div class="reminder-actions">
+          <button class="action-btn complete-btn">Mark Complete</button>
+          <button class="action-btn snooze-btn">Snooze 7 Days</button>
+          <button class="action-btn delete-btn">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="completed" class="reminder-content">
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <h4 class="reminder-title">Blood Pressure Check</h4>
+          <div>
+            <span class="reminder-date">Completed: August 1, 2023</span>
+            <span class="reminder-priority priority-medium">Medium Priority</span>
+          </div>
+        </div>
+        <p class="reminder-description">Patient John Smith had blood pressure check during routine visit. Reading was 132/84 mmHg, well-controlled on current medication regimen.</p>
+      </div>
+      
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <h4 class="reminder-title">HbA1c Test</h4>
+          <div>
+            <span class="reminder-date">Completed: July 15, 2023</span>
+            <span class="reminder-priority priority-high">High Priority</span>
+          </div>
+        </div>
+        <p class="reminder-description">Patient Jane Doe completed HbA1c test. Result was 6.5%, indicating good glycemic control. Will continue current management plan.</p>
+      </div>
+      
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <h4 class="reminder-title">Medication Adjustment</h4>
+          <div>
+            <span class="reminder-date">Completed: July 5, 2023</span>
+            <span class="reminder-priority priority-high">High Priority</span>
+          </div>
+        </div>
+        <p class="reminder-description">Patient Robert Johnson's atorvastatin dose increased from 20mg to 40mg daily based on lipid panel results showing LDL of 136 mg/dL.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Toggle Button -->
+  <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <script>
+    // Tab functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabs = document.querySelectorAll('.reminder-tab');
+      const tabContents = document.querySelectorAll('.reminder-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          // Remove active class from all tabs and contents
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(content => content.classList.remove('active'));
+          
+          // Add active class to clicked tab and corresponding content
+          this.classList.add('active');
+          const tabId = this.getAttribute('data-tab');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+      
+      // Dark mode functionality
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      
+      // Check for saved theme preference
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        themeToggle.classList.add('dark');
+      }
+      
+      // Toggle theme
+      themeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+        
+        if (body.classList.contains('dark-mode')) {
+          localStorage.setItem('theme', 'dark');
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          themeToggle.classList.add('dark');
+        } else {
+          localStorage.setItem('theme', 'light');
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          themeToggle.classList.remove('dark');
+        }
+      });
+
+      // Add reminder button
+      document.getElementById('add-reminder').addEventListener('click', function() {
+        // In a real app, this would open a form to add a new reminder
+        alert('Adding new reminder...');
+      });
+
+      // Complete buttons
+      document.querySelectorAll('.complete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const card = this.closest('.reminder-card');
+          card.style.opacity = '0.5';
+          setTimeout(() => {
+            card.style.display = 'none';
+            alert('Reminder marked as complete.');
+          }, 300);
+        });
+      });
+
+      // Snooze buttons
+      document.querySelectorAll('.snooze-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          alert('Reminder snoozed for 7 days.');
+        });
+      });
+
+      // Delete buttons
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          if (confirm('Are you sure you want to delete this reminder?')) {
+            const card = this.closest('.reminder-card');
+            card.style.opacity = '0';
+            setTimeout(() => {
+              card.remove();
+              alert('Reminder deleted.');
+            }, 300);
+          }
+        });
+      });
+    });
+  </script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>

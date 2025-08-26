@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedAnalyzer - Trend Analysis</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- Load Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* ... your CSS remains unchanged ... */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📈 Trend Analysis</h1>
+      <p>Analyze changes in lab values over time to identify patterns and track patient progress.</p>
+    </header>
+
+    <!-- Filters Section -->
+    <div class="filters">
+      <div class="filter-group">
+        <label for="patient">Select Patient</label>
+        <select id="patient">
+          <option value="">All Patients</option>
+          <option value="1">John Smith</option>
+          <option value="2">Jane Doe</option>
+          <option value="3">Robert Johnson</option>
+          <option value="4">Sarah Wilson</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="test">Select Test</label>
+        <select id="test">
+          <option value="all">All Tests</option>
+          <option value="glucose">Glucose</option>
+          <option value="hba1c">HbA1c</option>
+          <option value="cholesterol">Cholesterol</option>
+          <option value="creatinine">Creatinine</option>
+          <option value="hemoglobin">Hemoglobin</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="date-range">Date Range</label>
+        <select id="date-range">
+          <option value="30">Last 30 days</option>
+          <option value="90" selected>Last 3 months</option>
+          <option value="180">Last 6 months</option>
+          <option value="365">Last 12 months</option>
+          <option value="custom">Custom Range</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="compare">Compare With</label>
+        <select id="compare">
+          <option value="none">None</option>
+          <option value="population">Population Average</option>
+          <option value="target">Target Range</option>
+          <option value="previous">Previous Year</option>
+        </select>
+      </div>
+      
+      <div style="display: flex; align-items: flex-end;">
+        <button class="btn" id="generate-report">Generate Report</button>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="chart-container">
+      <h3>Lab Values Over Time</h3>
+      <div style="height: 400px;">
+        <canvas id="trendsChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <h3>Key Biomarkers Comparison</h3>
+      <div style="height: 400px;">
+        <canvas id="comparisonChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Analysis Summary -->
+    <div class="analysis-summary">
+      <h3>Analysis Summary</h3>
+      <ul>
+        <li>Glucose levels show a consistent downward trend over the past 3 months, indicating improved glycemic control.</li>
+        <li>HbA1c has decreased from 7.8% to 6.9%, now within target range for diabetes management.</li>
+        <li>LDL cholesterol remains elevated at 135 mg/dL, suggesting need for continued lipid-lowering therapy.</li>
+        <li>No significant changes in kidney function markers (creatinine and eGFR) over the monitoring period.</li>
+        <li>Overall trend indicates positive response to current treatment regimen with room for further improvement in lipid profile.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Theme Toggle Button -->
+  <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Trend Chart
+      const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+      const trendsChart = new Chart(trendsCtx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          datasets: [
+            {
+              label: 'Glucose (mg/dL)',
+              data: [145, 138, 132, 128, 125, 122, 118, 115, 112, 110, 108, 105],
+              borderColor: '#ef4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              tension: 0.4,
+              fill: true
+            },
+            {
+              label: 'HbA1c (%)',
+              data: [7.8, 7.6, 7.4, 7.2, 7.0, 6.9, 6.8, 6.7, 6.6, 6.5, 6.4, 6.3],
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              tension: 0.4,
+              fill: true
+            },
+            {
+              label: 'LDL (mg/dL)',
+              data: [145, 142, 140, 138, 136, 135, 134, 133, 132, 131, 130, 129],
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              tension: 0.4,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top' },
+            tooltip: { mode: 'index', intersect: false }
+          },
+          scales: { y: { beginAtZero: false } }
+        }
+      });
+
+      // Comparison Chart
+      const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+      const comparisonChart = new Chart(comparisonCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Glucose', 'HbA1c', 'Total Cholesterol', 'HDL', 'LDL', 'Triglycerides'],
+          datasets: [
+            {
+              label: 'Current Values',
+              data: [105, 6.3, 190, 45, 129, 145],
+              backgroundColor: '#3b82f6',
+              borderColor: '#3b82f6',
+              borderWidth: 1
+            },
+            {
+              label: '3 Months Ago',
+              data: [125, 7.0, 210, 42, 136, 165],
+              backgroundColor: '#9ca3af',
+              borderColor: '#9ca3af',
+              borderWidth: 1
+            },
+            {
+              label: 'Target Range',
+              data: [100, 6.5, 200, 40, 100, 150],
+              backgroundColor: '#10b981',
+              borderColor: '#10b981',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'top' } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+
+      // Dark mode functionality
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        themeToggle.classList.add('dark');
+      }
+      
+      themeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) {
+          localStorage.setItem('theme', 'dark');
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          themeToggle.classList.add('dark');
+        } else {
+          localStorage.setItem('theme', 'light');
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          themeToggle.classList.remove('dark');
+        }
+      });
+
+      // Generate report button
+      document.getElementById('generate-report').addEventListener('click', function() {
+        alert('Generating trend analysis report...');
+      });
+    });
+  </script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>

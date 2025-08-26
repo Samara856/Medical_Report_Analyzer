@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedAnalyzer - Medical Dictionary</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafc;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    body.dark-mode {
+      background-color: #1a202c;
+      color: #e2e8f0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      transition: border-color 0.3s;
+    }
+    
+    body.dark-mode header {
+      border-color: #4a5568;
+    }
+    
+    header h1 {
+      color: #1a365d;
+      margin: 0 0 10px 0;
+      font-size: 2rem;
+    }
+    
+    body.dark-mode header h1 {
+      color: #e2e8f0;
+    }
+    
+    header p {
+      color: #4a5568;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    
+    body.dark-mode header p {
+      color: #a0aec0;
+    }
+    
+    .search-container {
+      margin-bottom: 30px;
+    }
+    
+    .search-bar {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    
+    .search-input {
+      flex: 1;
+      padding: 14px 18px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px 0 0 8px;
+      font-size: 16px;
+      border-right: none;
+    }
+    
+    body.dark-mode .search-input {
+      background-color: #2d3748;
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    body.dark-mode .search-input:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+    
+    .search-button {
+      background: #60a5fa;
+      color: white;
+      border: 2px solid #60a5fa;
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      padding: 0 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .search-button {
+      background: #4299e1;
+      border-color: #4299e1;
+    }
+    
+    .search-button:hover {
+      background: #3b82f6;
+      border-color: #3b82f6;
+    }
+    
+    body.dark-mode .search-button:hover {
+      background: #3182ce;
+      border-color: #3182ce;
+    }
+    
+    .alphabet-nav {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .letter-link {
+      padding: 8px 12px;
+      background: #f1f5f9;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #4a5568;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .letter-link {
+      background: #4a5568;
+      color: #e2e8f0;
+    }
+    
+    .letter-link:hover, .letter-link.active {
+      background: #60a5fa;
+      color: white;
+    }
+    
+    body.dark-mode .letter-link:hover, body.dark-mode .letter-link.active {
+      background: #3182ce;
+    }
+    
+    .definition-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    
+    body.dark-mode .definition-card {
+      background-color: #2d3748;
+      border-color: #4a5568;
+    }
+    
+    .term {
+      color: #1a365d;
+      margin: 0 0 15px 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    
+    body.dark-mode .term {
+      color: #e2e8f0;
+    }
+    
+    .pronunciation {
+      color: #718096;
+      font-style: italic;
+      margin-bottom: 15px;
+    }
+    
+    body.dark-mode .pronunciation {
+      color: #a0aec0;
+    }
+    
+    .definition {
+      color: #4a5568;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    
+    body.dark-mode .definition {
+      color: #e2e8f0;
+    }
+    
+    .category {
+      display: inline-block;
+      padding: 4px 8px;
+      background: #e0f2fe;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+    }
+    
+    body.dark-mode .category {
+      background: #0891b2;
+      color: white;
+    }
+    
+    .related-terms {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    body.dark-mode .related-terms {
+      border-color: #4a5568;
+    }
+    
+    .related-terms h4 {
+      color: #2d3748;
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+    
+    body.dark-mode .related-terms h4 {
+      color: #e2e8f0;
+    }
+    
+    .related-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .related-item {
+      background: #f8fafc;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    body.dark-mode .related-item {
+      background: #4a5568;
+    }
+    
+    .related-item a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    
+    .related-item a:hover {
+      text-decoration: underline;
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #718096;
+    }
+    
+    body.dark-mode .no-results {
+      color: #a0aec0;
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1a365d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .theme-toggle {
+      background: #2d3748;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      background: #2c5282;
+    }
+    
+    body.dark-mode .theme-toggle:hover {
+      background: #4a5568;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📖 Medical Dictionary</h1>
+      <p>Comprehensive medical terminology with definitions, pronunciations, and explanations.</p>
+    </header>
+
+    <div class="search-container">
+      <div class="search-bar">
+        <input type="text" id="search-term" class="search-input" placeholder="Search for medical terms...">
+        <button class="search-button" id="search-button">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+      
+      <div class="alphabet-nav">
+        <a href="#" class="letter-link active" data-letter="all">All</a>
+        <a href="#" class="letter-link" data-letter="A">A</a>
+        <a href="#" class="letter-link" data-letter="B">B</a>
+        <a href="#" class="letter-link" data-letter="C">C</a>
+        <a href="#" class="letter-link" data-letter="D">D</a>
+        <a href="#" class="letter-link" data-letter="E">E</a>
+        <a href="#" class="letter-link" data-letter="F">F</a>
+        <a href="#" class="letter-link" data-letter="G">G</a>
+        <a href="#" class="letter-link" data-letter="H">H</a>
+        <a href="#" class="letter-link" data-letter="I">I</a>
+        <a href="#" class="letter-link" data-letter="J">J</a>
+        <a href="#" class="letter-link" data-letter="K">K</a>
+        <a href="#" class="letter-link" data-letter="L">L</a>
+        <a href="#" class="letter-link" data-letter="M">M</a>
+        <a href="#" class="letter-link" data-letter="N">N</a>
+        <a href="#" class="letter-link" data-letter="O">O</a>
+        <a href="#" class="letter-link" data-letter="P">P</a>
+        <a href="#" class="letter-link" data-letter="Q">Q</a>
+        <a href="#" class="letter-link" data-letter="R">R</a>
+        <a href="#" class="letter-link" data-letter="S">S</a>
+        <a href="#" class="letter-link" data-letter="T">T</a>
+        <a href="#" class="letter-link" data-letter="U">U</a>
+        <a href="#" class="letter-link" data-letter="V">V</a>
+        <a href="#" class="letter-link" data-letter="W">W</a>
+        <a href="#" class="letter-link" data-letter="X">X</a>
+        <a href="#" class="letter-link" data-letter="Y">Y</a>
+        <a href="#" class="letter-link" data-letter="Z">Z</a>
+      </div>
+    </div>
+
+    <div id="definitions">
+      <div class="definition-card">
+        <span class="category">Hematology</span>
+        <h3 class="term">Anemia</h3>
+        <p class="pronunciation">/əˈniːmiə/</p>
+        <p class="definition">A condition characterized by a deficiency of red blood cells or hemoglobin in the blood, resulting in pallor and fatigue. Anemia can be caused by various factors including iron deficiency, vitamin B12 deficiency, chronic disease, or blood loss. It is diagnosed when hemoglobin levels fall below normal ranges (typically <12 g/dL in women and <13.5 g/dL in men).</p>
+        <div class="related-terms">
+          <h4>Related Terms</h4>
+          <div class="related-list">
+            <div class="related-item"><a href="#">Hemoglobin</a></div>
+            <div class="related-item"><a href="#">Iron deficiency</a></div>
+            <div class="related-item"><a href="#">Vitamin B12</a></div>
+            <div class="related-item"><a href="#">RBC count</a></div>
+            <div class="related-item"><a href="#">Hematocrit</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="definition-card">
+        <span class="category">Endocrinology</span>
+        <h3 class="term">Diabetes Mellitus</h3>
+        <p class="pronunciation">/ˌdaɪ.əˈbiː.tiːz ˈmel.ɪ.təs/</p>
+        <p class="definition">A chronic metabolic disorder characterized by high blood glucose levels due to defects in insulin secretion, insulin action, or both. There are two main types: Type 1 diabetes, an autoimmune condition where the body destroys insulin-producing cells, and Type 2 diabetes, which is characterized by insulin resistance and relative insulin deficiency. Long-term complications include cardiovascular disease, kidney failure, nerve damage, and vision problems.</p>
+        <div class="related-terms">
+          <h4>Related Terms</h4>
+          <div class="related-list">
+            <div class="related-item"><a href="#">Insulin</a></div>
+            <div class="related-item"><a href="#">Glucose</a></div>
+            <div class="related-item"><a href="#">HbA1c</a></div>
+            <div class="related-item"><a href="#">Hyperglycemia</a></div>
+            <div class="related-item"><a href="#">Hypoglycemia</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="definition-card">
+        <span class="category">Cardiology</span>
+        <h3 class="term">Hypertension</h3>
+        <p class="pronunciation">/ˌhaɪ.pərˈten.ʃən/</p>
+        <p class="definition">Persistently elevated arterial blood pressure, typically defined as systolic pressure ≥140 mm Hg and/or diastolic pressure ≥90 mm Hg. Hypertension is a major risk factor for heart disease, stroke, kidney disease, and other health problems. It is often called the "silent killer" because it typically has no symptoms. Management includes lifestyle modifications and medications to reduce cardiovascular risk.</p>
+        <div class="related-terms">
+          <h4>Related Terms</h4>
+          <div class="related-list">
+            <div class="related-item"><a href="#">Blood pressure</a></div>
+            <div class="related-item"><a href="#">Systolic</a></div>
+            <div class="related-item"><a href="#">Diastolic</a></div>
+            <div class="related-item"><a href="#">ACE inhibitor</a></div>
+            <div class="related-item"><a href="#">ARB</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="definition-card">
+        <span class="category">Biochemistry</span>
+        <h3 class="term">Cholesterol</h3>
+        <p class="pronunciation">/kəˈlest.ər.ɒl/</p>
+        <p class="definition">A waxy, fat-like substance found in all cells of the body. Cholesterol is essential for making hormones, vitamin D, and substances that help digest foods. The body makes all the cholesterol it needs, but it is also found in animal-based foods. There are two main types: HDL (high-density lipoprotein), known as "good" cholesterol, and LDL (low-density lipoprotein), known as "bad" cholesterol. High levels of LDL cholesterol increase the risk of heart disease and stroke.</p>
+        <div class="related-terms">
+          <h4>Related Terms</h4>
+          <div class="related-list">
+            <div class="related-item"><a href="#">LDL</a></div>
+            <div class="related-item"><a href="#">HDL</a></div>
+            <div class="related-item"><a href="#">Triglycerides</a></div>
+            <div class="related-item"><a href="#">Lipid panel</a></div>
+            <div class="related-item"><a href="#">Statins</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="definition-card">
+        <span class="category">Nephrology</span>
+        <h3 class="term">Creatinine</h3>
+        <p class="pronunciation">/kriːˈæt.ɪn.ɪn/</p>
+        <p class="definition">A waste product formed by the breakdown of creatine in muscle. Creatinine is filtered out of the blood by the kidneys and excreted in urine. Serum creatinine levels are used as a measure of kidney function, with higher levels indicating impaired kidney function. Normal range is typically 0.6-1.3 mg/dL, but varies by age, sex, and muscle mass. Estimated glomerular filtration rate (eGFR) is calculated from creatinine levels to assess kidney function more accurately.</p>
+        <div class="related-terms">
+          <h4>Related Terms</h4>
+          <div class="related-list">
+            <div class="related-item"><a href="#">Kidney function</a></div>
+            <div class="related-item"><a href="#">eGFR</a></div>
+            <div class="related-item"><a href="#">Renal failure</a></div>
+            <div class="related-item"><a href="#">BUN</a></div>
+            <div class="related-item"><a href="#">Dialysis</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="definition-card">
+        <span class="category">Endocrinology</span>
+        <h3 class="term">HbA1c</h3>
+        <p class="pronunciation">/eɪtʃ biː eɪ wʌn siː/</p>
+        <p class="definition">Hemoglobin A1c, also known as glycated hemoglobin, is a form of hemoglobin that is measured to identify the average plasma glucose concentration over a prolonged period (approximately 2-3 months). It forms when glucose attaches to hemoglobin in red blood cells, which have a lifespan of about 120 days. HbA1c is used to diagnose diabetes (≥6.5%) and monitor long-term glucose control in people with diabetes. Target for most adults with diabetes is <7%.</p>
+        <div class="related-terms">
+          <h4>Related Terms</h4>
+          <div class="related-list">
+            <div class="related-item"><a href="#">Diabetes</a></div>
+            <div class="related-item"><a href="#">Glucose</a></div>
+            <div class="related-item"><a href="#">Hemoglobin</a></div>
+            <div class="related-item"><a href="#">Glycation</a></div>
+            <div class="related-item"><a href="#">Insulin</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Toggle Button -->
+  <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <script>
+    // Dark mode functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      
+      // Check for saved theme preference
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        themeToggle.classList.add('dark');
+      }
+      
+      // Toggle theme
+      themeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+        
+        if (body.classList.contains('dark-mode')) {
+          localStorage.setItem('theme', 'dark');
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          themeToggle.classList.add('dark');
+        } else {
+          localStorage.setItem('theme', 'light');
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          themeToggle.classList.remove('dark');
+        }
+      });
+
+      // Alphabet navigation
+      const letterLinks = document.querySelectorAll('.letter-link');
+      letterLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          letterLinks.forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+          
+          // In a real app, this would filter terms by starting letter
+          const letter = this.getAttribute('data-letter');
+          alert(`Filtering terms starting with "${letter}"`);
+        });
+      });
+
+      // Search functionality
+      document.getElementById('search-button').addEventListener('click', function() {
+        const searchTerm = document.getElementById('search-term').value.trim();
+        if (searchTerm) {
+          // In a real app, this would search the dictionary
+          alert(`Searching for: "${searchTerm}"`);
+        }
+      });
+
+      // Allow search on Enter key
+      document.getElementById('search-term').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          document.getElementById('search-button').click();
+        }
+      });
+    });
+  </script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>

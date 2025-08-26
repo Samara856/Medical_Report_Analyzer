@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedAnalyzer - Latest Research</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafc;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    body.dark-mode {
+      background-color: #1a202c;
+      color: #e2e8f0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      transition: border-color 0.3s;
+    }
+    
+    body.dark-mode header {
+      border-color: #4a5568;
+    }
+    
+    header h1 {
+      color: #1a365d;
+      margin: 0 0 10px 0;
+      font-size: 2rem;
+    }
+    
+    body.dark-mode header h1 {
+      color: #e2e8f0;
+    }
+    
+    header p {
+      color: #4a5568;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    
+    body.dark-mode header p {
+      color: #a0aec0;
+    }
+    
+    .filters {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .filter-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2d3748;
+      font-weight: 600;
+    }
+    
+    body.dark-mode .filter-group label {
+      color: #e2e8f0;
+    }
+    
+    .filter-group select, .filter-group input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    
+    body.dark-mode .filter-group select, body.dark-mode .filter-group input {
+      background-color: #2d3748;
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+    
+    .filter-group select:focus, .filter-group input:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .btn {
+      background: #1a365d;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+    
+    body.dark-mode .btn {
+      background: #3182ce;
+    }
+    
+    .btn:hover {
+      background: #2c5282;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    body.dark-mode .btn:hover {
+      background: #2b6cb0;
+    }
+    
+    .research-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    
+    body.dark-mode .research-card {
+      background-color: #2d3748;
+      border-color: #4a5568;
+    }
+    
+    .research-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    
+    .research-title {
+      margin: 0;
+      color: #1a365d;
+      font-size: 1.5rem;
+    }
+    
+    body.dark-mode .research-title {
+      color: #e2e8f0;
+    }
+    
+    .research-date {
+      color: #718096;
+      font-size: 0.9rem;
+    }
+    
+    body.dark-mode .research-date {
+      color: #a0aec0;
+    }
+    
+    .research-category {
+      display: inline-block;
+      padding: 4px 8px;
+      background: #e0f2fe;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+    }
+    
+    body.dark-mode .research-category {
+      background: #0891b2;
+      color: white;
+    }
+    
+    .research-authors {
+      color: #4a5568;
+      font-style: italic;
+      margin-bottom: 15px;
+    }
+    
+    body.dark-mode .research-authors {
+      color: #e2e8f0;
+    }
+    
+    .research-journal {
+      color: #718096;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+    
+    body.dark-mode .research-journal {
+      color: #a0aec0;
+    }
+    
+    .research-abstract {
+      color: #4a5568;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    
+    body.dark-mode .research-abstract {
+      color: #e2e8f0;
+    }
+    
+    .research-keypoints {
+      background: #f8fafc;
+      border-left: 4px solid #60a5fa;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 6px;
+    }
+    
+    body.dark-mode .research-keypoints {
+      background-color: #4a5568;
+      border-left-color: #60a5fa;
+    }
+    
+    .research-keypoints h4 {
+      color: #2d3748;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    
+    body.dark-mode .research-keypoints h4 {
+      color: #e2e8f0;
+    }
+    
+    .research-keypoints ul {
+      margin: 10px 0;
+      color: #4a5568;
+    }
+    
+    body.dark-mode .research-keypoints ul {
+      color: #e2e8f0;
+    }
+    
+    .research-keypoints li {
+      margin-bottom: 8px;
+    }
+    
+    .research-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .action-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .read-btn {
+      background: #60a5fa;
+      color: white;
+    }
+    
+    .read-btn:hover {
+      background: #3b82f6;
+    }
+    
+    .save-btn {
+      background: #68d391;
+      color: white;
+    }
+    
+    .save-btn:hover {
+      background: #48bb78;
+    }
+    
+    .cite-btn {
+      background: #6b7280;
+      color: white;
+    }
+    
+    .cite-btn:hover {
+      background: #4b5563;
+    }
+    
+    .trending {
+      display: inline-block;
+      padding: 4px 8px;
+      background: #fef3c7;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    
+    body.dark-mode .trending {
+      background: #92400e;
+      color: #fde68a;
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1a365d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .theme-toggle {
+      background: #2d3748;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      background: #2c5282;
+    }
+    
+    body.dark-mode .theme-toggle:hover {
+      background: #4a5568;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔬 Latest Research</h1>
+      <p>Stay updated with the latest medical research and clinical studies.</p>
+    </header>
+
+    <div class="filters">
+      <div class="filter-group">
+        <label for="category">Category</label>
+        <select id="category">
+          <option value="all">All Categories</option>
+          <option value="diabetes">Diabetes</option>
+          <option value="cardiovascular">Cardiovascular</option>
+          <option value="oncology">Oncology</option>
+          <option value="neurology">Neurology</option>
+          <option value="infectious">Infectious Disease</option>
+          <option value="endocrinology">Endocrinology</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="timeframe">Timeframe</label>
+        <select id="timeframe">
+          <option value="7">Last 7 Days</option>
+          <option value="30" selected>Last 30 Days</option>
+          <option value="90">Last 3 Months</option>
+          <option value="365">Last 12 Months</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="sort">Sort By</label>
+        <select id="sort">
+          <option value="date">Most Recent</option>
+          <option value="citations">Most Cited</option>
+          <option value="impact">Highest Impact Factor</option>
+        </select>
+      </div>
+      
+      <div style="display: flex; align-items: flex-end;">
+        <button class="btn" id="search-research">Search Research</button>
+      </div>
+    </div>
+
+    <div class="research-card">
+      <div class="research-header">
+        <h3 class="research-title">Semaglutide for Weight Loss: A Randomized Clinical Trial</h3>
+        <span class="research-date">Published: September 1, 2023</span>
+      </div>
+      
+      <span class="research-category">Endocrinology</span>
+      
+      <p class="research-authors">Smith J, Johnson R, Williams K, et al.</p>
+      
+      <p class="research-journal">New England Journal of Medicine, Volume 389, Issue 9</p>
+      
+      <p class="research-abstract">This randomized, double-blind, placebo-controlled trial evaluated the efficacy and safety of semaglutide (2.4 mg weekly) for weight management in adults with overweight or obesity. Among 1,961 participants, those receiving semaglutide achieved a mean weight reduction of 14.9% at 68 weeks compared to 2.4% with placebo. The most common adverse events were gastrointestinal and typically mild to moderate in severity. Semaglutide represents a significant advancement in pharmacological weight management.</p>
+      
+      <div class="research-keypoints">
+        <h4>Key Findings</h4>
+        <ul>
+          <li>Mean weight reduction of 14.9% with semaglutide vs 2.4% with placebo</li>
+          <li>78% of semaglutide recipients lost at least 10% of body weight</li>
+          <li>Improvements in cardiometabolic risk factors including blood pressure and lipids</li>
+          <li>Most common side effects: nausea (44%), diarrhea (35%), vomiting (24%)</li>
+          <li>No increased risk of serious adverse events compared to placebo</li>
+        </ul>
+      </div>
+      
+      <div class="research-actions">
+        <button class="action-btn read-btn">Read Full Study</button>
+        <button class="action-btn save-btn">Save to Library</button>
+        <button class="action-btn cite-btn">Cite This Study</button>
+      </div>
+    </div>
+
+    <div class="research-card">
+      <div class="research-header">
+        <h3 class="research-title">Artificial Intelligence in Diabetic Retinopathy Screening</h3>
+        <span class="research-date">Published: August 28, 2023</span>
+      </div>
+      
+      <span class="research-category">Ophthalmology</span>
+      
+      <p class="research-authors">Chen L, Patel A, Rodriguez M, et al.</p>
+      
+      <p class="research-journal">JAMA Ophthalmology, Volume 141, Issue 8</p>
+      
+      <p class="research-abstract">This multicenter study evaluated an artificial intelligence system for detecting referable diabetic retinopathy in retinal images. The AI system demonstrated 98.5% sensitivity and 96.2% specificity compared to expert graders. Implementation in primary care settings increased screening rates from 52% to 89% and reduced time to diagnosis by 65%. The study supports the integration of AI-assisted screening to improve early detection and prevent vision loss in diabetic patients.</p>
+      
+      <div class="research-keypoints">
+        <h4>Key Findings</h4>
+        <ul>
+          <li>AI system sensitivity: 98.5%, specificity: 96.2%</li>
+          <li>Screening rates increased from 52% to 89% with AI implementation</li>
+          <li>Time to diagnosis reduced by 65% (from 45 to 16 days)</li>
+          <li>Cost-effectiveness analysis showed $230 savings per patient screened</li>
+          <li>Patient satisfaction with AI screening was 94%</li>
+        </ul>
+      </div>
+      
+      <div class="research-actions">
+        <button class="action-btn read-btn">Read Full Study</button>
+        <button class="action-btn save-btn">Save to Library</button>
+        <button class="action-btn cite-btn">Cite This Study</button>
+      </div>
+    </div>
+
+    <div class="research-card">
+      <div class="research-header">
+        <h3 class="research-title">SGLT2 Inhibitors and Heart Failure Outcomes</h3>
+        <span class="research-date">Published: August 25, 2023</span>
+      </div>
+      
+      <span class="research-category">Cardiology</span>
+      
+      <p class="research-authors">Anderson B, Thompson D, Garcia S, et al.</p>
+      
+      <p class="research-journal">Circulation, Volume 148, Issue 8</p>
+      
+      <p class="research-abstract">A meta-analysis of 12 randomized trials including 58,000 patients with heart failure found that SGLT2 inhibitors reduced the risk of cardiovascular death or hospitalization for heart failure by 29% compared to placebo. Benefits were consistent across ejection fraction categories and were observed within 30 days of initiation. The findings support expanding the use of SGLT2 inhibitors in heart failure management regardless of diabetes status.</p>
+      
+      <div class="research-keypoints">
+        <h4>Key Findings</h4>
+        <ul>
+          <li>29% reduction in cardiovascular death or HF hospitalization</li>
+          <li>Benefits observed in both HFrEF and HFpEF patients</li>
+          <li>Effects seen regardless of diabetes status</li>
+          <li>Number needed to treat: 22 to prevent one event over 18 months</li>
+          <li>Minimal side effects with low risk of hypoglycemia</li>
+        </ul>
+      </div>
+      
+      <div class="research-actions">
+        <button class="action-btn read-btn">Read Full Study</button>
+        <button class="action-btn save-btn">Save to Library</button>
+        <button class="action-btn cite-btn">Cite This Study</button>
+      </div>
+    </div>
+
+    <div class="research-card">
+      <div class="research-header">
+        <h3 class="research-title">Precision Medicine in Type 2 Diabetes</h3>
+        <span class="research-date">Published: August 20, 2023</span>
+      </div>
+      
+      <span class="research-category">Endocrinology</span>
+      
+      <p class="research-authors">Wilson E, Brown M, Davis T, et al.</p>
+      
+      <p class="research-journal">Nature Medicine, Volume 29, Issue 8</p>
+      
+      <p class="research-abstract">This study used machine learning to identify five distinct subtypes of type 2 diabetes based on clinical and biomarker data. The subtypes predicted differential responses to medications, with one subtype showing excellent response to GLP-1 agonists but poor response to sulfonylureas. Implementing this classification could personalize treatment selection and improve outcomes. The findings represent a significant step toward precision medicine in diabetes care.</p>
+      
+      <div class="research-keypoints">
+        <h4>Key Findings</h4>
+        <ul>
+          <li>Five distinct subtypes of type 2 diabetes identified</li>
+          <li>Subtypes predicted differential medication responses</li>
+          <li>One subtype had 80% better response to GLP-1 agonists</li>
+          <li>Genetic and biomarker profiles differed between subtypes</li>
+          <li>Potential to improve treatment selection and outcomes</li>
+        </ul>
+      </div>
+      
+      <div class="research-actions">
+        <button class="action-btn read-btn">Read Full Study</button>
+        <button class="action-btn save-btn">Save to Library</button>
+        <button class="action-btn cite-btn">Cite This Study</button>
+      </div>
+    </div>
+
+    <div class="research-card">
+      <div class="research-header">
+        <h3 class="research-title">Gut Microbiome and Metabolic Health</h3>
+        <span class="research-date">Published: August 15, 2023</span>
+      </div>
+      
+      <span class="research-category">Microbiology</span>
+      
+      <p class="research-authors">Taylor R, Martinez L, Kim J, et al.</p>
+      
+      <p class="research-journal">Cell, Volume 186, Issue 16</p>
+      
+      <p class="research-abstract">A longitudinal study of 1,200 adults found that specific gut microbiome signatures were associated with improved metabolic health and reduced diabetes risk. Participants with higher microbial diversity and specific beneficial bacteria (Akkermansia, Faecalibacterium) had better insulin sensitivity and lower inflammation markers. Dietary interventions that increased fiber intake rapidly improved microbiome composition and metabolic parameters, suggesting a modifiable target for prevention.</p>
+      
+      <div class="research-keypoints">
+        <h4>Key Findings</h4>
+        <ul>
+          <li>Higher microbial diversity associated with better metabolic health</li>
+          <li>Akkermansia and Faecalibacterium linked to improved insulin sensitivity</li>
+          <li>Dietary fiber increased beneficial bacteria within 24 hours</li>
+          <li>Microbiome signature predicted diabetes risk better than traditional factors</li>
+          <li>Potential for microbiome-targeted interventions</li>
+        </ul>
+      </div>
+      
+      <div class="research-actions">
+        <button class="action-btn read-btn">Read Full Study</button>
+        <button class="action-btn save-btn">Save to Library</button>
+        <button class="action-btn cite-btn">Cite This Study</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Toggle Button -->
+  <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <script>
+    // Dark mode functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      
+      // Check for saved theme preference
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        themeToggle.classList.add('dark');
+      }
+      
+      // Toggle theme
+      themeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+        
+        if (body.classList.contains('dark-mode')) {
+          localStorage.setItem('theme', 'dark');
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          themeToggle.classList.add('dark');
+        } else {
+          localStorage.setItem('theme', 'light');
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          themeToggle.classList.remove('dark');
+        }
+      });
+
+      // Search research button
+      document.getElementById('search-research').addEventListener('click', function() {
+        // In a real app, this would search the research database
+        alert('Searching for research articles...');
+      });
+
+      // Read buttons
+      document.querySelectorAll('.read-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          // In a real app, this would open the full study
+          alert('Opening full research study...');
+        });
+      });
+
+      // Save buttons
+      document.querySelectorAll('.save-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          // In a real app, this would save the study to the user's library
+          alert('Research article saved to your library.');
+        });
+      });
+
+      // Cite buttons
+      document.querySelectorAll('.cite-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          // In a real app, this would generate a citation
+          alert('Citation generated: Smith J, et al. NEJM 2023;389:789-798.');
+        });
+      });
+    });
+  </script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>

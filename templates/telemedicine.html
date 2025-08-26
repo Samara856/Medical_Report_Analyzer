@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedAnalyzer - Telemedicine</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafc;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    body.dark-mode {
+      background-color: #1a202c;
+      color: #e2e8f0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      transition: border-color 0.3s;
+    }
+    
+    body.dark-mode header {
+      border-color: #4a5568;
+    }
+    
+    header h1 {
+      color: #1a365d;
+      margin: 0 0 10px 0;
+      font-size: 2rem;
+    }
+    
+    body.dark-mode header h1 {
+      color: #e2e8f0;
+    }
+    
+    header p {
+      color: #4a5568;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    
+    body.dark-mode header p {
+      color: #a0aec0;
+    }
+    
+    .telemedicine-container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 30px;
+    }
+    
+    @media (max-width: 768px) {
+      .telemedicine-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .schedule-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    
+    body.dark-mode .schedule-card {
+      background-color: #2d3748;
+      border-color: #4a5568;
+    }
+    
+    .schedule-card h3 {
+      color: #1a365d;
+      margin-top: 0;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    body.dark-mode .schedule-card h3 {
+      color: #e2e8f0;
+      border-color: #4a5568;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2d3748;
+      font-weight: 600;
+    }
+    
+    body.dark-mode .form-group label {
+      color: #e2e8f0;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    
+    body.dark-mode .form-control {
+      background-color: #2d3748;
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    body.dark-mode .form-control:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+    
+    .btn {
+      background: #1a365d;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+    
+    body.dark-mode .btn {
+      background: #3182ce;
+    }
+    
+    .btn:hover {
+      background: #2c5282;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    body.dark-mode .btn:hover {
+      background: #2b6cb0;
+    }
+    
+    .btn-secondary {
+      background: #68d391;
+    }
+    
+    body.dark-mode .btn-secondary {
+      background: #48bb78;
+    }
+    
+    .btn-secondary:hover {
+      background: #48bb78;
+    }
+    
+    body.dark-mode .btn-secondary:hover {
+      background: #38a169;
+    }
+    
+    .calendar {
+      margin-top: 20px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    body.dark-mode .calendar {
+      border-color: #4a5568;
+    }
+    
+    .calendar-header {
+      background: #f1f5f9;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    body.dark-mode .calendar-header {
+      background: #4a5568;
+    }
+    
+    .calendar-title {
+      margin: 0;
+      color: #1a365d;
+      font-size: 1.1rem;
+    }
+    
+    body.dark-mode .calendar-title {
+      color: #e2e8f0;
+    }
+    
+    .calendar-nav {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .nav-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .nav-btn {
+      background: #2d3748;
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+    
+    .nav-btn:hover {
+      background: #f8fafc;
+      border-color: #60a5fa;
+    }
+    
+    body.dark-mode .nav-btn:hover {
+      background: #4a5568;
+    }
+    
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    body.dark-mode .calendar-grid {
+      border-color: #4a5568;
+    }
+    
+    .calendar-day-header {
+      background: #f8fafc;
+      padding: 10px;
+      text-align: center;
+      font-weight: 600;
+      color: #4a5568;
+      border-right: 1px solid #e2e8f0;
+    }
+    
+    body.dark-mode .calendar-day-header {
+      background: #4a5568;
+      border-color: #718096;
+      color: #e2e8f0;
+    }
+    
+    .calendar-day-header:last-child {
+      border-right: none;
+    }
+    
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+    
+    .calendar-day {
+      min-height: 80px;
+      padding: 10px;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      position: relative;
+    }
+    
+    body.dark-mode .calendar-day {
+      border-color: #4a5568;
+    }
+    
+    .calendar-day:last-child,
+    .calendar-day:nth-child(7n) {
+      border-right: none;
+    }
+    
+    .day-number {
+      color: #4a5568;
+      font-size: 0.9rem;
+    }
+    
+    body.dark-mode .day-number {
+      color: #e2e8f0;
+    }
+    
+    .calendar-day.today .day-number {
+      background: #60a5fa;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .calendar-day.other-month .day-number {
+      color: #cbd5e0;
+    }
+    
+    body.dark-mode .calendar-day.other-month .day-number {
+      color: #718096;
+    }
+    
+    .appointment {
+      background: #e0f2fe;
+      border-radius: 4px;
+      padding: 4px 6px;
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: #0891b2;
+      cursor: pointer;
+    }
+    
+    body.dark-mode .appointment {
+      background: #0891b2;
+      color: white;
+    }
+    
+    .appointment.urgent {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    
+    body.dark-mode .appointment.urgent {
+      background: #7f1d1d;
+      color: #fca5a5;
+    }
+    
+    .video-call {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    
+    body.dark-mode .video-call {
+      background-color: #2d3748;
+      border-color: #4a5568;
+    }
+    
+    .video-call h3 {
+      color: #1a365d;
+      margin-top: 0;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    body.dark-mode .video-call h3 {
+      color: #e2e8f0;
+      border-color: #4a5568;
+    }
+    
+    .call-info {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    body.dark-mode .call-info {
+      background: #4a5568;
+    }
+    
+    .call-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+    
+    .call-detail {
+      flex: 1;
+    }
+    
+    .call-detail h4 {
+      color: #2d3748;
+      margin: 0 0 5px 0;
+    }
+    
+    body.dark-mode .call-detail h4 {
+      color: #e2e8f0;
+    }
+    
+    .call-detail p {
+      color: #4a5568;
+      margin: 0;
+    }
+    
+    body.dark-mode .call-detail p {
+      color: #e2e8f0;
+    }
+    
+    .call-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .call-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .join-call {
+      background: #10b981;
+      color: white;
+    }
+    
+    .join-call:hover {
+      background: #059669;
+    }
+    
+    .reschedule {
+      background: #60a5fa;
+      color: white;
+    }
+    
+    .reschedule:hover {
+      background: #3b82f6;
+    }
+    
+    .cancel-call {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .cancel-call:hover {
+      background: #dc2626;
+    }
+    
+    .upcoming-calls {
+      margin-top: 30px;
+    }
+    
+    .upcoming-calls h3 {
+      color: #1a365d;
+      margin-top: 0;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    body.dark-mode .upcoming-calls h3 {
+      color: #e2e8f0;
+      border-color: #4a5568;
+    }
+    
+    .call-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .call-item {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+    }
+    
+    body.dark-mode .call-item {
+      background-color: #2d3748;
+      border-color: #4a5568;
+    }
+    
+    .call-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    
+    .call-title {
+      margin: 0;
+      color: #1a365d;
+    }
+    
+    body.dark-mode .call-title {
+      color: #e2e8f0;
+    }
+    
+    .call-date {
+      color: #718096;
+      font-size: 0.9rem;
+    }
+    
+    body.dark-mode .call-date {
+      color: #a0aec0;
+    }
+    
+    .call-info {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+    
+    .call-info span {
+      color: #4a5568;
+    }
+    
+    body.dark-mode .call-info span {
+      color: #e2e8f0;
+    }
+    
+    .call-status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-scheduled {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+    
+    .status-completed {
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+    
+    body.dark-mode .status-scheduled {
+      background: #15803d;
+      color: #86efac;
+    }
+    
+    body.dark-mode .status-completed {
+      background: #374151;
+      color: #9ca3af;
+    }
+    
+    .call-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .action-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .join-btn {
+      background: #10b981;
+      color: white;
+    }
+    
+    .join-btn:hover {
+      background: #059669;
+    }
+    
+    .reschedule-btn {
+      background: #60a5fa;
+      color: white;
+    }
+    
+    .reschedule-btn:hover {
+      background: #3b82f6;
+    }
+    
+    .cancel-btn {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .cancel-btn:hover {
+      background: #dc2626;
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1a365d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .theme-toggle {
+      background: #2d3748;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      background: #2c5282;
+    }
+    
+    body.dark-mode .theme-toggle:hover {
+      background: #4a5568;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📹 Telemedicine</h1>
+      <p>Schedule and conduct virtual consultations with patients.</p>
+    </header>
+
+    <div class="telemedicine-container">
+      <div class="schedule-card">
+        <h3>Schedule New Appointment</h3>
+        
+        <div class="form-group">
+          <label for="patient">Select Patient</label>
+          <select id="patient" class="form-control">
+            <option value="">Select Patient</option>
+            <option value="1">John Smith</option>
+            <option value="2">Jane Doe</option>
+            <option value="3">Robert Johnson</option>
+            <option value="4">Sarah Wilson</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="purpose">Purpose of Visit</label>
+          <select id="purpose" class="form-control">
+            <option value="">Select Purpose</option>
+            <option value="follow-up">Follow-up Appointment</option>
+            <option value="consultation">Consultation</option>
+            <option value="medication">Medication Review</option>
+            <option value="results">Results Discussion</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="date">Date</label>
+          <input type="date" id="date" class="form-control">
+        </div>
+        
+        <div class="form-group">
+          <label for="time">Time</label>
+          <select id="time" class="form-control">
+            <option value="">Select Time</option>
+            <option value="9:00">9:00 AM</option>
+            <option value="9:30">9:30 AM</option>
+            <option value="10:00">10:00 AM</option>
+            <option value="10:30">10:30 AM</option>
+            <option value="11:00">11:00 AM</option>
+            <option value="11:30">11:30 AM</option>
+            <option value="1:00">1:00 PM</option>
+            <option value="1:30">1:30 PM</option>
+            <option value="2:00">2:00 PM</option>
+            <option value="2:30">2:30 PM</option>
+            <option value="3:00">3:00 PM</option>
+            <option value="3:30">3:30 PM</option>
+            <option value="4:00">4:00 PM</option>
+            <option value="4:30">4:30 PM</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="duration">Duration</label>
+          <select id="duration" class="form-control">
+            <option value="15">15 minutes</option>
+            <option value="30" selected>30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60">60 minutes</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="notes">Additional Notes</label>
+          <textarea id="notes" class="form-control" rows="3" placeholder="Any special instructions or preparation for the patient..."></textarea>
+        </div>
+        
+        <button class="btn" id="schedule-appointment">Schedule Appointment</button>
+      </div>
+      
+      <div class="video-call">
+        <h3>Upcoming Video Call</h3>
+        
+        <div class="call-info">
+          <div class="call-details">
+            <div class="call-detail">
+              <h4>Patient</h4>
+              <p>John Smith</p>
+            </div>
+            <div class="call-detail">
+              <h4>Date & Time</h4>
+              <p>September 15, 2023, 2:00 PM</p>
+            </div>
+            <div class="call-detail">
+              <h4>Duration</h4>
+              <p>30 minutes</p>
+            </div>
+          </div>
+          
+          <div class="call-actions">
+            <button class="call-btn join-call" id="join-call">Join Call</button>
+            <button class="call-btn reschedule" id="reschedule-call">Reschedule</button>
+            <button class="call-btn cancel-call" id="cancel-call">Cancel</button>
+          </div>
+        </div>
+        
+        <div class="call-info">
+          <h4>Technical Requirements</h4>
+          <p>For the best experience, please ensure you have:</p>
+          <ul style="margin: 10px 0 0 20px; color: #4a5568;">
+            <li>Stable internet connection (minimum 5 Mbps)</li>
+            <li>Webcam and microphone enabled</li>
+            <li>Latest version of Chrome, Firefox, or Safari</li>
+            <li>Quiet environment with good lighting</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="upcoming-calls">
+      <h3>Scheduled Appointments</h3>
+      
+      <ul class="call-list">
+        <li class="call-item">
+          <div class="call-header">
+            <h4 class="call-title">Follow-up Appointment</h4>
+            <span class="call-date">Sep 15, 2023 • 2:00 PM</span>
+          </div>
+          <div class="call-info">
+            <span>👤 John Smith</span>
+            <span>⏱️ 30 minutes</span>
+            <span class="call-status status-scheduled">Scheduled</span>
+          </div>
+          <div class="call-actions">
+            <button class="action-btn join-btn">Join Call</button>
+            <button class="action-btn reschedule-btn">Reschedule</button>
+            <button class="action-btn cancel-btn">Cancel</button>
+          </div>
+        </li>
+        
+        <li class="call-item">
+          <div class="call-header">
+            <h4 class="call-title">Results Discussion</h4>
+            <span class="call-date">Sep 18, 2023 • 10:30 AM</span>
+          </div>
+          <div class="call-info">
+            <span>👤 Jane Doe</span>
+            <span>⏱️ 45 minutes</span>
+            <span class="call-status status-scheduled">Scheduled</span>
+          </div>
+          <div class="call-actions">
+            <button class="action-btn join-btn">Join Call</button>
+            <button class="action-btn reschedule-btn">Reschedule</button>
+            <button class="action-btn cancel-btn">Cancel</button>
+          </div>
+        </li>
+        
+        <li class="call-item">
+          <div class="call-header">
+            <h4 class="call-title">Medication Review</h4>
+            <span class="call-date">Sep 20, 2023 • 3:00 PM</span>
+          </div>
+          <div class="call-info">
+            <span>👤 Robert Johnson</span>
+            <span>⏱️ 30 minutes</span>
+            <span class="call-status status-scheduled">Scheduled</span>
+          </div>
+          <div class="call-actions">
+            <button class="action-btn join-btn">Join Call</button>
+            <button class="action-btn reschedule-btn">Reschedule</button>
+            <button class="action-btn cancel-btn">Cancel</button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Theme Toggle Button -->
+  <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <script>
+    // Dark mode functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      
+      // Check for saved theme preference
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        themeToggle.classList.add('dark');
+      }
+      
+      // Toggle theme
+      themeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+        
+        if (body.classList.contains('dark-mode')) {
+          localStorage.setItem('theme', 'dark');
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          themeToggle.classList.add('dark');
+        } else {
+          localStorage.setItem('theme', 'light');
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          themeToggle.classList.remove('dark');
+        }
+      });
+
+      // Schedule appointment button
+      document.getElementById('schedule-appointment').addEventListener('click', function() {
+        const patient = document.getElementById('patient').value;
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+        
+        if (!patient || !date || !time) {
+          alert('Please select a patient, date, and time.');
+          return;
+        }
+        
+        // In a real app, this would schedule the appointment
+        alert('Appointment scheduled successfully!');
+      });
+
+      // Join call button
+      document.getElementById('join-call').addEventListener('click', function() {
+        // In a real app, this would connect to the video call
+        alert('Connecting to video call...');
+      });
+
+      // Reschedule button
+      document.getElementById('reschedule-call').addEventListener('click', function() {
+        // In a real app, this would open a rescheduling form
+        alert('Opening rescheduling options...');
+      });
+
+      // Cancel button
+      document.getElementById('cancel-call').addEventListener('click', function() {
+        if (confirm('Are you sure you want to cancel this appointment?')) {
+          // In a real app, this would cancel the appointment
+          alert('Appointment cancelled.');
+        }
+      });
+
+      // Join call buttons
+      document.querySelectorAll('.join-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          // In a real app, this would connect to the video call
+          alert('Connecting to video call...');
+        });
+      });
+
+      // Reschedule buttons
+      document.querySelectorAll('.reschedule-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          // In a real app, this would open a rescheduling form
+          alert('Opening rescheduling options...');
+        });
+      });
+
+      // Cancel buttons
+      document.querySelectorAll('.cancel-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          if (confirm('Are you sure you want to cancel this appointment?')) {
+            // In a real app, this would cancel the appointment
+            this.closest('.call-item').style.opacity = '0.5';
+            setTimeout(() => {
+              this.closest('.call-item').remove();
+              alert('Appointment cancelled.');
+            }, 300);
+          }
+        });
+      });
+    });
+  </script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>

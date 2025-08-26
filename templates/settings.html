@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedAnalyzer Settings</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    header {
+      background: #1a365d;
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    
+    header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+    
+    .content {
+      padding: 40px;
+    }
+    
+    .settings-section {
+      margin-bottom: 40px;
+    }
+    
+    .section-title {
+      font-size: 1.8rem;
+      color: #1a365d;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 3px solid #667eea;
+      display: inline-block;
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #1a365d;
+      font-size: 1.1rem;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .checkbox-group input {
+      width: auto;
+      height: 20px;
+      width: 20px;
+    }
+    
+    .checkbox-group label {
+      margin-bottom: 0;
+      cursor: pointer;
+    }
+    
+    .btn {
+      background: #667eea;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+    
+    .btn:hover {
+      background: #5a6fd8;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #1a365d;
+    }
+    
+    .btn-secondary:hover {
+      background: #cbd5e0;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      justify-content: flex-end;
+    }
+    
+    .theme-preview {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .theme-option {
+      flex: 1;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .theme-option:hover {
+      transform: translateY(-3px);
+    }
+    
+    .theme-light {
+      background: #f8fafc;
+      color: #1e293b;
+      border: 2px solid #e2e8f0;
+    }
+    
+    .theme-dark {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 2px solid #475569;
+    }
+    
+    .theme-auto {
+      background: linear-gradient(45deg, #1e293b 0%, #f8fafc 100%);
+      color: #f8fafc;
+      border: 2px solid #475569;
+    }
+    
+    .active-theme {
+      border: 3px solid #667eea !important;
+      transform: scale(1.02);
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        margin: 10px;
+        border-radius: 10px;
+      }
+      
+      header {
+        padding: 20px;
+      }
+      
+      header h1 {
+        font-size: 2rem;
+      }
+      
+      .content {
+        padding: 20px;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>⚙️ Settings</h1>
+      <p>Customize your MedAnalyzer experience</p>
+    </header>
+    
+    <div class="content">
+      <div class="settings-section">
+        <h2 class="section-title">Profile Information</h2>
+        
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="Enter your full name">
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="Enter your email address">
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" placeholder="Enter your phone number">
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <h2 class="section-title">Preferences</h2>
+        
+        <div class="form-group">
+          <label for="language">Language</label>
+          <select id="language">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="zh">Chinese</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="units">Measurement Units</label>
+          <select id="units">
+            <option value="metric">Metric (kg, cm)</option>
+            <option value="imperial">Imperial (lbs, inches)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="timezone">Time Zone</label>
+          <select id="timezone">
+            <option value="utc">UTC (Coordinated Universal Time)</option>
+            <option value="est">EST (Eastern Standard Time)</option>
+            <option value="pst">PST (Pacific Standard Time)</option>
+            <option value="cet">CET (Central European Time)</option>
+            <option value="jst">JST (Japan Standard Time)</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <h2 class="section-title">Appearance</h2>
+        
+        <div class="form-group">
+          <label>Theme</label>
+          <div class="theme-preview">
+            <div class="theme-option theme-light active-theme" data-theme="light">
+              Light Mode
+            </div>
+            <div class="theme-option theme-dark" data-theme="dark">
+              Dark Mode
+            </div>
+            <div class="theme-option theme-auto" data-theme="auto">
+              Auto (System)
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="font-size">Font Size</label>
+          <select id="font-size">
+            <option value="small">Small</option>
+            <option value="medium" selected>Medium</option>
+            <option value="large">Large</option>
+            <option value="x-large">Extra Large</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <h2 class="section-title">Notifications</h2>
+        
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="email-notifications" checked>
+            <label for="email-notifications">Email Notifications</label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="push-notifications" checked>
+            <label for="push-notifications">Push Notifications</label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="report-reminders">
+            <label for="report-reminders">Report Analysis Reminders</label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="follow-up-reminders" checked>
+            <label for="follow-up-reminders">Follow-up Appointment Reminders</label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <h2 class="section-title">Data & Privacy</h2>
+        
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="data-sharing" checked>
+            <label for="data-sharing">Allow anonymous data sharing for research</label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="personalized-recommendations" checked>
+            <label for="personalized-recommendations">Receive personalized health recommendations</label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="data-retention">Data Retention Period</label>
+          <select id="data-retention">
+            <option value="1">1 month</option>
+            <option value="3">3 months</option>
+            <option value="6">6 months</option>
+            <option value="12" selected>12 months</option>
+            <option value="forever">Keep indefinitely</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="btn-group">
+        <button class="btn btn-secondary">Reset to Default</button>
+        <button class="btn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Theme selection functionality
+    document.querySelectorAll('.theme-option').forEach(option => {
+      option.addEventListener('click', function() {
+        // Remove active class from all options
+        document.querySelectorAll('.theme-option').forEach(opt => {
+          opt.classList.remove('active-theme');
+        });
+        
+        // Add active class to clicked option
+        this.classList.add('active-theme');
+        
+        // Here you would typically update the UI theme
+        // For demo purposes, we'll just show an alert
+        alert(`Theme changed to ${this.textContent}`);
+      });
+    });
+    
+    // Form submission
+    document.querySelector('.btn').addEventListener('click', function() {
+      // Validate form (basic validation)
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      
+      if (!name || !email) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+      
+      // In a real app, you would save the settings here
+      alert('Settings saved successfully!');
+    });
+    
+    // Reset button
+    document.querySelector('.btn-secondary').addEventListener('click', function() {
+      if (confirm('Are you sure you want to reset all settings to default?')) {
+        // Reset all form fields
+        document.getElementById('name').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('language').value = 'en';
+        document.getElementById('units').value = 'metric';
+        document.getElementById('timezone').value = 'utc';
+        document.getElementById('font-size').value = 'medium';
+        document.getElementById('data-retention').value = '12';
+        
+        // Reset checkboxes
+        document.getElementById('email-notifications').checked = true;
+        document.getElementById('push-notifications').checked = true;
+        document.getElementById('report-reminders').checked = false;
+        document.getElementById('follow-up-reminders').checked = true;
+        document.getElementById('data-sharing').checked = true;
+        document.getElementById('personalized-recommendations').checked = true;
+        
+        // Reset theme to light
+        document.querySelectorAll('.theme-option').forEach(opt => {
+          opt.classList.remove('active-theme');
+        });
+        document.querySelector('.theme-light').classList.add('active-theme');
+        
+        alert('Settings reset to default values.');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedAnalyzer - Medical History</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafc;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    body.dark-mode {
+      background-color: #1a202c;
+      color: #e2e8f0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      transition: border-color 0.3s;
+    }
+    
+    body.dark-mode header {
+      border-color: #4a5568;
+    }
+    
+    header h1 {
+      color: #1a365d;
+      margin: 0 0 10px 0;
+      font-size: 2rem;
+    }
+    
+    body.dark-mode header h1 {
+      color: #e2e8f0;
+    }
+    
+    header p {
+      color: #4a5568;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    
+    body.dark-mode header p {
+      color: #a0aec0;
+    }
+    
+    .filters {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .filter-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2d3748;
+      font-weight: 600;
+    }
+    
+    body.dark-mode .filter-group label {
+      color: #e2e8f0;
+    }
+    
+    .filter-group select, .filter-group input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    
+    body.dark-mode .filter-group select, body.dark-mode .filter-group input {
+      background-color: #2d3748;
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+    
+    .filter-group select:focus, .filter-group input:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .btn {
+      background: #1a365d;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+    
+    body.dark-mode .btn {
+      background: #3182ce;
+    }
+    
+    .btn:hover {
+      background: #2c5282;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    body.dark-mode .btn:hover {
+      background: #2b6cb0;
+    }
+    
+    .patient-info {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    
+    body.dark-mode .patient-info {
+      background-color: #2d3748;
+      border-color: #4a5568;
+    }
+    
+    .patient-info h3 {
+      color: #1a365d;
+      margin-top: 0;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    body.dark-mode .patient-info h3 {
+      color: #e2e8f0;
+      border-color: #4a5568;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    
+    .info-item {
+      margin-bottom: 15px;
+    }
+    
+    .info-item label {
+      display: block;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 5px;
+    }
+    
+    body.dark-mode .info-item label {
+      color: #e2e8f0;
+    }
+    
+    .info-item span {
+      color: #4a5568;
+    }
+    
+    body.dark-mode .info-item span {
+      color: #e2e8f0;
+    }
+    
+    .history-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      transition: border-color 0.3s;
+    }
+    
+    body.dark-mode .history-tabs {
+      border-color: #4a5568;
+    }
+    
+    .history-tab {
+      padding: 12px 24px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #718096;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .history-tab {
+      color: #a0aec0;
+    }
+    
+    .history-tab.active {
+      color: #1a365d;
+      border-bottom: 3px solid #60a5fa;
+    }
+    
+    body.dark-mode .history-tab.active {
+      color: #60a5fa;
+    }
+    
+    .history-tab:hover {
+      color: #4a5568;
+    }
+    
+    body.dark-mode .history-tab:hover {
+      color: #e2e8f0;
+    }
+    
+    .history-content {
+      display: none;
+    }
+    
+    .history-content.active {
+      display: block;
+    }
+    
+    .history-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    
+    body.dark-mode .history-card {
+      background-color: #2d3748;
+      border-color: #4a5568;
+    }
+    
+    .history-card h4 {
+      color: #1a365d;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    
+    body.dark-mode .history-card h4 {
+      color: #e2e8f0;
+    }
+    
+    .history-card p {
+      color: #4a5568;
+      margin: 8px 0;
+    }
+    
+    body.dark-mode .history-card p {
+      color: #e2e8f0;
+    }
+    
+    .history-card .date {
+      color: #718096;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+    
+    body.dark-mode .history-card .date {
+      color: #a0aec0;
+    }
+    
+    .timeline {
+      position: relative;
+      padding-left: 30px;
+      margin: 20px 0;
+    }
+    
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e2e8f0;
+    }
+    
+    body.dark-mode .timeline::before {
+      background: #4a5568;
+    }
+    
+    .timeline-item {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 8px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #60a5fa;
+      border: 2px solid white;
+      box-shadow: 0 0 0 2px #60a5fa;
+    }
+    
+    body.dark-mode .timeline-item::before {
+      border-color: #2d3748;
+    }
+    
+    .timeline-content {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+    }
+    
+    body.dark-mode .timeline-content {
+      background-color: #2d3748;
+      border-color: #4a5568;
+    }
+    
+    .timeline-date {
+      font-weight: 600;
+      color: #1a365d;
+      margin-bottom: 5px;
+    }
+    
+    body.dark-mode .timeline-date {
+      color: #e2e8f0;
+    }
+    
+    .timeline-title {
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 8px;
+    }
+    
+    body.dark-mode .timeline-title {
+      color: #e2e8f0;
+    }
+    
+    .timeline-description {
+      color: #4a5568;
+      margin-bottom: 10px;
+    }
+    
+    body.dark-mode .timeline-description {
+      color: #e2e8f0;
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1a365d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .theme-toggle {
+      background: #2d3748;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      background: #2c5282;
+    }
+    
+    body.dark-mode .theme-toggle:hover {
+      background: #4a5568;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏥 Medical History</h1>
+      <p>Comprehensive medical history and timeline for patient John Smith.</p>
+    </header>
+
+    <div class="filters">
+      <div class="filter-group">
+        <label for="patient">Select Patient</label>
+        <select id="patient">
+          <option value="1" selected>John Smith</option>
+          <option value="2">Jane Doe</option>
+          <option value="3">Robert Johnson</option>
+          <option value="4">Sarah Wilson</option>
+        </select>
+      </div>
+      
+      <div style="display: flex; align-items: flex-end;">
+        <button class="btn" id="export-history">Export History</button>
+      </div>
+    </div>
+
+    <div class="patient-info">
+      <h3>Patient Information</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Name</label>
+          <span>John Smith</span>
+        </div>
+        <div class="info-item">
+          <label>Date of Birth</label>
+          <span>January 15, 1978 (45 years)</span>
+        </div>
+        <div class="info-item">
+          <label>Gender</label>
+          <span>Male</span>
+        </div>
+        <div class="info-item">
+          <label>Medical Record Number</label>
+          <span>MRN-12345</span>
+        </div>
+        <div class="info-item">
+          <label>Primary Physician</label>
+          <span>Dr. Emily Chen</span>
+        </div>
+        <div class="info-item">
+          <label>Insurance</label>
+          <span>Blue Cross Blue Shield</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="history-tabs">
+      <div class="history-tab active" data-tab="overview">Overview</div>
+      <div class="history-tab" data-tab="timeline">Timeline</div>
+      <div class="history-tab" data-tab="diagnoses">Diagnoses</div>
+      <div class="history-tab" data-tab="medications">Medications</div>
+      <div class="history-tab" data-tab="procedures">Procedures</div>
+      <div class="history-tab" data-tab="allergies">Allergies</div>
+    </div>
+
+    <div id="overview" class="history-content active">
+      <div class="history-card">
+        <h4>Current Health Status</h4>
+        <p class="date">As of September 5, 2023</p>
+        <p><strong>Diagnosis:</strong> Type 2 Diabetes, Hyperlipidemia, Hypertension</p>
+        <p><strong>Current Medications:</strong> Metformin 1000mg BID, Atorvastatin 40mg daily, Lisinopril 20mg daily</p>
+        <p><strong>Last HbA1c:</strong> 6.3% (September 5, 2023)</p>
+        <p><strong>Last LDL:</strong> 129 mg/dL (September 5, 2023)</p>
+        <p><strong>Last Blood Pressure:</strong> 132/84 mmHg (September 5, 2023)</p>
+      </div>
+      
+      <div class="history-card">
+        <h4>Family History</h4>
+        <p><strong>Diabetes:</strong> Father (diagnosed at age 55), Mother (diagnosed at age 60)</p>
+        <p><strong>Heart Disease:</strong> Father (myocardial infarction at age 62)</p>
+        <p><strong>Hypertension:</strong> Both parents</p>
+        <p><strong>Hyperlipidemia:</strong> Father</p>
+      </div>
+      
+      <div class="history-card">
+        <h4>Social History</h4>
+        <p><strong>Smoking:</strong> Never smoked</p>
+        <p><strong>Alcohol:</strong> Occasional (1-2 drinks per week)</p>
+        <p><strong>Exercise:</strong> Walks 30 minutes daily, 5 days per week</p>
+        <p><strong>Diet:</strong> Generally healthy, follows Mediterranean-style diet</p>
+        <p><strong>Occupation:</strong> Software Engineer (sedentary)</p>
+      </div>
+      
+      <div class="history-card">
+        <h4>Recent Trends</h4>
+        <p><strong>Diabetes Control:</strong> HbA1c has improved from 7.8% (January 2023) to 6.3% (September 2023)</p>
+        <p><strong>Lipid Profile:</strong> LDL has decreased from 145 mg/dL to 129 mg/dL over the past 6 months</p>
+        <p><strong>Blood Pressure:</strong> Well-controlled on current medication regimen</p>
+        <p><strong>Weight:</strong> Stable at 185 lbs (BMI 28.5)</p>
+      </div>
+    </div>
+
+    <div id="timeline" class="history-content">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <div class="timeline-date">September 5, 2023</div>
+            <div class="timeline-title">Annual Checkup & Lab Work</div>
+            <div class="timeline-description">
+              <p>Comprehensive metabolic panel, lipid panel, HbA1c, and complete blood count performed. Results show continued improvement in diabetes control and lipid profile.</p>
+              <p><strong>Key Findings:</strong> HbA1c 6.3%, LDL 129 mg/dL, BP 132/84 mmHg</p>
+              <p><strong>Plan:</strong> Continue current medications, follow up in 3 months.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <div class="timeline-date">June 10, 2023</div>
+            <div class="timeline-title">Follow-up Visit</div>
+            <div class="timeline-description">
+              <p>Follow-up for diabetes and hyperlipidemia management. Patient reports good adherence to medication and dietary recommendations.</p>
+              <p><strong>Key Findings:</strong> HbA1c 6.7%, LDL 136 mg/dL, BP 135/86 mmHg</p>
+              <p><strong>Plan:</strong> Continue current regimen, increase exercise duration to 45 minutes daily.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <div class="timeline-date">March 22, 2023</div>
+            <div class="timeline-title">Initial Diagnosis & Treatment Plan</div>
+            <div class="timeline-description">
+              <p>Diagnosed with Type 2 Diabetes (HbA1c 7.4%), Hyperlipidemia (LDL 142 mg/dL), and Hypertension (BP 148/92 mmHg).</p>
+              <p><strong>Treatment Initiated:</strong> Metformin 500mg BID, Atorvastatin 20mg daily, Lisinopril 10mg daily</p>
+              <p><strong>Recommendations:</strong> Dietary counseling, exercise program, weight loss goal of 10 lbs.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <div class="timeline-date">January 15, 2023</div>
+            <div class="timeline-title">New Patient Visit</div>
+            <div class="timeline-description">
+              <p>Initial visit for routine checkup. Patient presented with fatigue and increased thirst. Family history of diabetes and heart disease noted.</p>
+              <p><strong>Testing Ordered:</strong> Fasting glucose, HbA1c, lipid panel, comprehensive metabolic panel.</p>
+              <p><strong>Assessment:</strong> Possible prediabetes, elevated cholesterol, borderline hypertension.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <div class="timeline-date">December 20, 2022</div>
+            <div class="timeline-title">Preventive Health Screening</div>
+            <div class="timeline-description">
+              <p>Routine physical examination. Patient reported no specific complaints. Vital signs: BP 140/88 mmHg, HR 72 bpm, Weight 190 lbs.</p>
+              <p><strong>Recommendations:</strong> Annual screening labs, colonoscopy at age 45, continue healthy lifestyle.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="diagnoses" class="history-content">
+      <div class="history-card">
+        <h4>Active Diagnoses</h4>
+        <p><strong>Type 2 Diabetes</strong> - Diagnosed March 22, 2023</p>
+        <p><strong>Hyperlipidemia</strong> - Diagnosed March 22, 2023</p>
+        <p><strong>Hypertension</strong> - Diagnosed March 22, 2023</p>
+        <p><strong>Obesity (Class I)</strong> - Ongoing</p>
+      </div>
+      
+      <div class="history-card">
+        <h4>Resolved Diagnoses</h4>
+        <p><strong>Prediabetes</strong> - Diagnosed January 15, 2023, resolved September 5, 2023</p>
+        <p><strong>Borderline Hypertension</strong> - Diagnosed December 20, 2022, progressed to hypertension March 22, 2023</p>
+      </div>
+      
+      <div class="history-card">
+        <h4>Past Medical History</h4>
+        <p><strong>Appendectomy</strong> - Age 12</p>
+        <p><strong>Seasonal Allergies</strong> - Since childhood</p>
+        <p><strong>Varicella (Chickenpox)</strong> - Childhood</p>
+      </div>
+    </div>
+
+    <div id="medications" class="history-content">
+      <div class="history-card">
+        <h4>Current Medications</h4>
+        <p><strong>Metformin</strong> - 1000mg twice daily - For Type 2 Diabetes</p>
+        <p><strong>Atorvastatin</strong> - 40mg daily - For Hyperlipidemia</p>
+        <p><strong>Lisinopril</strong> - 20mg daily - For Hypertension</p>
+        <p><strong>Aspirin</strong> - 81mg daily - Cardiovascular protection</p>
+        <p><strong>Vitamin D</strong> - 2000 IU daily - Supplementation</p>
+      </div>
+      
+      <div class="history-card">
+        <h4>Medication History</h4>
+        <p><strong>Metformin</strong> - Started March 22, 2023 at 500mg BID, increased to 1000mg BID June 10, 2023</p>
+        <p><strong>Atorvastatin</strong> - Started March 22, 2023 at 20mg daily, increased to 40mg daily June 10, 2023</p>
+        <p><strong>Lisinopril</strong> - Started March 22, 2023 at 10mg daily, increased to 20mg daily June 10, 2023</p>
+      </div>
+      
+      <div class="history-card">
+        <h4>Medication Allergies & Adverse Reactions</h4>
+        <p><strong>Sulfa Drugs</strong> - Rash and itching</p>
+        <p><strong>Penicillin</strong> - Nausea and diarrhea</p>
+      </div>
+    </div>
+
+    <div id="procedures" class="history-content">
+      <div class="history-card">
+        <h4>Surgical History</h4>
+        <p><strong>Appendectomy</strong> - Laparoscopic, January 2000, uncomplicated recovery</p>
+      </div>
+      
+      <div class="history-card">
+        <h4>Diagnostic Procedures</h4>
+        <p><strong>Colonoscopy</strong> - May 2022, normal, no polyps</p>
+        <p><strong>DEXA Scan</strong> - October 2021, normal bone density</p>
+        <p><strong>Stress Test</strong> - February 2021, normal exercise capacity, no ischemia</p>
+      </div>
+      
+      <div class="history-card">
+        <h4>Immunizations</h4>
+        <p><strong>Influenza</strong> - Annually since 2018</p>
+        <p><strong>Tdap</strong> - 2019</p>
+        <p><strong>Zoster (Shingles)</strong> - 2020</p>
+        <p><strong>Pneumococcal</strong> - 2018</p>
+        <p><strong>Hepatitis B</strong> - Completed series 2017</p>
+      </div>
+    </div>
+
+    <div id="allergies" class="history-content">
+      <div class="history-card">
+        <h4>Medication Allergies</h4>
+        <p><strong>Sulfa Drugs:</strong> Rash, itching, and swelling after taking sulfamethoxazole-trimethoprim</p>
+        <p><strong>Penicillin:</strong> Nausea, diarrhea, and mild rash</p>
+      </div>
+      
+      <div class="history-card">
+        <h4>Food Allergies</h4>
+        <p><strong>Shellfish:</strong> Mild reaction (hives) after eating shrimp, no anaphylaxis</p>
+        <p><strong>Peanuts:</strong> No known allergy</p>
+      </div>
+      
+      <div class="history-card">
+        <h4>Environmental Allergies</h4>
+        <p><strong>Pollen:</strong> Seasonal rhinitis (spring and fall), treated with antihistamines</p>
+        <p><strong>Dust Mites:</strong> Mild year-round symptoms</p>
+        <p><strong>Animal Dander:</strong> Mild reaction to cat dander</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Toggle Button -->
+  <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <script>
+    // Tab functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabs = document.querySelectorAll('.history-tab');
+      const tabContents = document.querySelectorAll('.history-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          // Remove active class from all tabs and contents
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(content => content.classList.remove('active'));
+          
+          // Add active class to clicked tab and corresponding content
+          this.classList.add('active');
+          const tabId = this.getAttribute('data-tab');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+      
+      // Dark mode functionality
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      
+      // Check for saved theme preference
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        themeToggle.classList.add('dark');
+      }
+      
+      // Toggle theme
+      themeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+        
+        if (body.classList.contains('dark-mode')) {
+          localStorage.setItem('theme', 'dark');
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          themeToggle.classList.add('dark');
+        } else {
+          localStorage.setItem('theme', 'light');
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          themeToggle.classList.remove('dark');
+        }
+      });
+
+      // Export history button
+      document.getElementById('export-history').addEventListener('click', function() {
+        // In a real app, this would export the patient's history
+        alert('Exporting patient history...');
+      });
+    });
+  </script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>

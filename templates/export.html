@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedAnalyzer - Export & Print</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafc;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    body.dark-mode {
+      background-color: #1a202c;
+      color: #e2e8f0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      transition: border-color 0.3s;
+    }
+    
+    body.dark-mode header {
+      border-color: #4a5568;
+    }
+    
+    header h1 {
+      color: #1a365d;
+      margin: 0 0 10px 0;
+      font-size: 2rem;
+    }
+    
+    body.dark-mode header h1 {
+      color: #e2e8f0;
+    }
+    
+    header p {
+      color: #4a5568;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    
+    body.dark-mode header p {
+      color: #a0aec0;
+    }
+    
+    .export-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+    
+    @media (max-width: 768px) {
+      .export-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .export-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    
+    body.dark-mode .export-card {
+      background-color: #2d3748;
+      border-color: #4a5568;
+    }
+    
+    .export-card h3 {
+      color: #1a365d;
+      margin-top: 0;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    body.dark-mode .export-card h3 {
+      color: #e2e8f0;
+      border-color: #4a5568;
+    }
+    
+    .format-option {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .format-option {
+      border-color: #4a5568;
+    }
+    
+    .format-option:hover {
+      background: #f8fafc;
+      border-color: #60a5fa;
+    }
+    
+    body.dark-mode .format-option:hover {
+      background: #4a5568;
+    }
+    
+    .format-option.selected {
+      background: #ebf8ff;
+      border-color: #60a5fa;
+    }
+    
+    body.dark-mode .format-option.selected {
+      background: #1e40af;
+      border-color: #60a5fa;
+    }
+    
+    .format-icon {
+      font-size: 24px;
+      margin-right: 15px;
+      color: #60a5fa;
+    }
+    
+    .format-info {
+      flex: 1;
+    }
+    
+    .format-title {
+      margin: 0;
+      color: #2d3748;
+      font-size: 1.1rem;
+    }
+    
+    body.dark-mode .format-title {
+      color: #e2e8f0;
+    }
+    
+    .format-description {
+      color: #718096;
+      margin: 5px 0 0 0;
+      font-size: 0.9rem;
+    }
+    
+    body.dark-mode .format-description {
+      color: #a0aec0;
+    }
+    
+    .format-features {
+      color: #4a5568;
+      margin: 10px 0 0 0;
+      font-size: 0.9rem;
+    }
+    
+    body.dark-mode .format-features {
+      color: #e2e8f0;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2d3748;
+      font-weight: 600;
+    }
+    
+    body.dark-mode .form-group label {
+      color: #e2e8f0;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    
+    body.dark-mode .form-control {
+      background-color: #2d3748;
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    body.dark-mode .form-control:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      margin-right: 10px;
+      accent-color: #60a5fa;
+    }
+    
+    .checkbox-group label {
+      color: #4a5568;
+      cursor: pointer;
+    }
+    
+    body.dark-mode .checkbox-group label {
+      color: #e2e8f0;
+    }
+    
+    .btn {
+      background: #1a365d;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+    
+    body.dark-mode .btn {
+      background: #3182ce;
+    }
+    
+    .btn:hover {
+      background: #2c5282;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    body.dark-mode .btn:hover {
+      background: #2b6cb0;
+    }
+    
+    .btn-secondary {
+      background: #68d391;
+    }
+    
+    body.dark-mode .btn-secondary {
+      background: #48bb78;
+    }
+    
+    .btn-secondary:hover {
+      background: #48bb78;
+    }
+    
+    body.dark-mode .btn-secondary:hover {
+      background: #38a169;
+    }
+    
+    .export-preview {
+      margin-top: 30px;
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    
+    body.dark-mode .export-preview {
+      background-color: #2d3748;
+      border-color: #4a5568;
+    }
+    
+    .export-preview h3 {
+      color: #1a365d;
+      margin-top: 0;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    body.dark-mode .export-preview h3 {
+      color: #e2e8f0;
+      border-color: #4a5568;
+    }
+    
+    .preview-content {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 200px;
+    }
+    
+    body.dark-mode .preview-content {
+      background: #4a5568;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    
+    .preview-title {
+      margin: 0;
+      color: #1a365d;
+      font-size: 1.3rem;
+    }
+    
+    body.dark-mode .preview-title {
+      color: #e2e8f0;
+    }
+    
+    .preview-date {
+      color: #718096;
+    }
+    
+    body.dark-mode .preview-date {
+      color: #a0aec0;
+    }
+    
+    .preview-section {
+      margin-bottom: 15px;
+    }
+    
+    .preview-section h4 {
+      color: #2d3748;
+      margin: 0 0 10px 0;
+    }
+    
+    body.dark-mode .preview-section h4 {
+      color: #e2e8f0;
+    }
+    
+    .preview-section p {
+      color: #4a5568;
+      margin: 5px 0;
+    }
+    
+    body.dark-mode .preview-section p {
+      color: #e2e8f0;
+    }
+    
+    .preview-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1a365d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .theme-toggle {
+      background: #2d3748;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      background: #2c5282;
+    }
+    
+    body.dark-mode .theme-toggle:hover {
+      background: #4a5568;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📥 Export & Print</h1>
+      <p>Export your analysis in various formats or print for physical copies.</p>
+    </header>
+
+    <div class="export-container">
+      <div class="export-card">
+        <h3>Select Export Format</h3>
+        
+        <div class="format-option" data-format="pdf">
+          <div class="format-icon">📄</div>
+          <div class="format-info">
+            <h4 class="format-title">PDF (Portable Document Format)</h4>
+            <p class="format-description">Professional-looking document with charts and analysis</p>
+            <p class="format-features">• Preserves formatting • Widely compatible • Password protection available</p>
+          </div>
+        </div>
+        
+        <div class="format-option" data-format="docx">
+          <div class="format-icon">📝</div>
+          <div class="format-info">
+            <h4 class="format-title">DOCX (Microsoft Word)</h4>
+            <p class="format-description">Editable document for further customization</p>
+            <p class="format-features">• Editable text • Add comments • Compatible with Word</p>
+          </div>
+        </div>
+        
+        <div class="format-option" data-format="csv">
+          <div class="format-icon">📊</div>
+          <div class="format-info">
+            <h4 class="format-title">CSV (Comma-Separated Values)</h4>
+            <p class="format-description">Structured data format for importing into spreadsheets</p>
+            <p class="format-features">• Import to Excel • Data analysis • Database integration</p>
+          </div>
+        </div>
+        
+        <div class="format-option" data-format="json">
+          <div class="format-icon">💾</div>
+          <div class="format-info">
+            <h4 class="format-title">JSON (JavaScript Object Notation)</h4>
+            <p class="format-description">Structured data format for integration with other systems</p>
+            <p class="format-features">• API integration • Web applications • Data exchange</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="export-card">
+        <h3>Export Options</h3>
+        
+        <div class="form-group">
+          <label for="patient">Select Patient</label>
+          <select id="patient" class="form-control">
+            <option value="">Select Patient</option>
+            <option value="1">John Smith</option>
+            <option value="2">Jane Doe</option>
+            <option value="3">Robert Johnson</option>
+            <option value="4">Sarah Wilson</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="report">Select Report</label>
+          <select id="report" class="form-control">
+            <option value="">Select Report</option>
+            <option value="1">September 5, 2023 - Comprehensive Analysis</option>
+            <option value="2">June 10, 2023 - Follow-up Lab Work</option>
+            <option value="3">March 22, 2023 - Initial Diagnosis</option>
+            <option value="4">January 15, 2023 - Annual Checkup</option>
+          </select>
+        </div>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="include-charts" checked>
+          <label for="include-charts">Include charts and visualizations</label>
+        </div>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="include-recommendations" checked>
+          <label for="include-recommendations">Include recommendations and tips</label>
+        </div>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="include-summary" checked>
+          <label for="include-summary">Include summary diagnosis</label>
+        </div>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="password-protect">
+          <label for="password-protect">Password protect exported file</label>
+        </div>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="add-watermark">
+          <label for="add-watermark">Add "Confidential" watermark</label>
+        </div>
+        
+        <button class="btn" id="export-file">Export File</button>
+        <button class="btn btn-secondary" style="margin-left: 10px;" id="print-file">Print</button>
+      </div>
+    </div>
+
+    <div class="export-preview">
+      <h3>Preview</h3>
+      
+      <div class="preview-content">
+        <div class="preview-header">
+          <h3 class="preview-title">Medical Report Analysis</h3>
+          <span class="preview-date">September 5, 2023</span>
+        </div>
+        
+        <div class="preview-section">
+          <h4>Lab Values and Status</h4>
+          <p><strong>Glucose:</strong> 105 mg/dL — Normal</p>
+          <p><strong>HbA1c:</strong> 6.3% — Normal</p>
+          <p><strong>Total Cholesterol:</strong> 190 mg/dL — Normal</p>
+          <p><strong>LDL:</strong> 129 mg/dL — High</p>
+        </div>
+        
+        <div class="preview-section">
+          <h4>Summary Diagnosis</h4>
+          <p>Possible diabetes risk detected. High LDL cholesterol — bad for heart health (less protective).</p>
+        </div>
+        
+        <div class="preview-section">
+          <h4>Recommendations</h4>
+          <p>Limit fried food, red meat, and full-fat dairy. Exercise regularly to boost heart health. Include more fiber (vegetables, oats, fruits).</p>
+        </div>
+      </div>
+      
+      <div class="preview-actions">
+        <button class="btn" id="download-preview">Download Preview</button>
+        <button class="btn btn-secondary" id="customize-preview">Customize</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Toggle Button -->
+  <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <script>
+    // Dark mode functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      
+      // Check for saved theme preference
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        themeToggle.classList.add('dark');
+      }
+      
+      // Toggle theme
+      themeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+        
+        if (body.classList.contains('dark-mode')) {
+          localStorage.setItem('theme', 'dark');
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          themeToggle.classList.add('dark');
+        } else {
+          localStorage.setItem('theme', 'light');
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          themeToggle.classList.remove('dark');
+        }
+      });
+
+      // Format selection
+      const formatOptions = document.querySelectorAll('.format-option');
+      formatOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          formatOptions.forEach(o => o.classList.remove('selected'));
+          this.classList.add('selected');
+        });
+      });
+
+      // Export file button
+      document.getElementById('export-file').addEventListener('click', function() {
+        const patient = document.getElementById('patient').value;
+        const report = document.getElementById('report').value;
+        const format = document.querySelector('.format-option.selected')?.getAttribute('data-format');
+        
+        if (!patient || !report) {
+          alert('Please select a patient and report.');
+          return;
+        }
+        
+        if (!format) {
+          alert('Please select an export format.');
+          return;
+        }
+        
+        // In a real app, this would export the file
+        alert(`Exporting report in ${format.toUpperCase()} format...`);
+      });
+
+      // Print button
+      document.getElementById('print-file').addEventListener('click', function() {
+        // In a real app, this would print the report
+        alert('Opening print dialog...');
+      });
+
+      // Download preview button
+      document.getElementById('download-preview').addEventListener('click', function() {
+        // In a real app, this would download the preview
+        alert('Downloading preview file...');
+      });
+
+      // Customize button
+      document.getElementById('customize-preview').addEventListener('click', function() {
+        // In a real app, this would open customization options
+        alert('Opening customization options...');
+      });
+    });
+  </script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>

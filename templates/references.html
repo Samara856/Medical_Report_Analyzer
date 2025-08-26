@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedAnalyzer - Reference Ranges</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafc;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    body.dark-mode {
+      background-color: #1a202c;
+      color: #e2e8f0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      transition: border-color 0.3s;
+    }
+    
+    body.dark-mode header {
+      border-color: #4a5568;
+    }
+    
+    header h1 {
+      color: #1a365d;
+      margin: 0 0 10px 0;
+      font-size: 2rem;
+    }
+    
+    body.dark-mode header h1 {
+      color: #e2e8f0;
+    }
+    
+    header p {
+      color: #4a5568;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    
+    body.dark-mode header p {
+      color: #a0aec0;
+    }
+    
+    .filters {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .filter-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2d3748;
+      font-weight: 600;
+    }
+    
+    body.dark-mode .filter-group label {
+      color: #e2e8f0;
+    }
+    
+    .filter-group select, .filter-group input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    
+    body.dark-mode .filter-group select, body.dark-mode .filter-group input {
+      background-color: #2d3748;
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+    
+    .filter-group select:focus, .filter-group input:focus {
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .btn {
+      background: #1a365d;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+    
+    body.dark-mode .btn {
+      background: #3182ce;
+    }
+    
+    .btn:hover {
+      background: #2c5282;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    body.dark-mode .btn:hover {
+      background: #2b6cb0;
+    }
+    
+    .reference-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      transition: border-color 0.3s;
+    }
+    
+    body.dark-mode .reference-tabs {
+      border-color: #4a5568;
+    }
+    
+    .reference-tab {
+      padding: 12px 24px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #718096;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .reference-tab {
+      color: #a0aec0;
+    }
+    
+    .reference-tab.active {
+      color: #1a365d;
+      border-bottom: 3px solid #60a5fa;
+    }
+    
+    body.dark-mode .reference-tab.active {
+      color: #60a5fa;
+    }
+    
+    .reference-tab:hover {
+      color: #4a5568;
+    }
+    
+    body.dark-mode .reference-tab:hover {
+      color: #e2e8f0;
+    }
+    
+    .reference-content {
+      display: none;
+    }
+    
+    .reference-content.active {
+      display: block;
+    }
+    
+    .category-header {
+      background: #f1f5f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    body.dark-mode .category-header {
+      background: #4a5568;
+    }
+    
+    .category-title {
+      color: #1a365d;
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    
+    body.dark-mode .category-title {
+      color: #e2e8f0;
+    }
+    
+    .category-description {
+      color: #4a5568;
+      margin: 10px 0 0 0;
+    }
+    
+    body.dark-mode .category-description {
+      color: #a0aec0;
+    }
+    
+    .reference-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    
+    .reference-table th {
+      text-align: left;
+      padding: 12px;
+      background: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
+      font-weight: 600;
+      color: #4a5568;
+    }
+    
+    body.dark-mode .reference-table th {
+      background: #4a5568;
+      border-color: #718096;
+      color: #e2e8f0;
+    }
+    
+    .reference-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #4a5568;
+    }
+    
+    body.dark-mode .reference-table td {
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+    
+    .reference-table tr:hover {
+      background: #f8fafc;
+    }
+    
+    body.dark-mode .reference-table tr:hover {
+      background: #4a5568;
+    }
+    
+    .unit {
+      color: #718096;
+      font-size: 0.9rem;
+    }
+    
+    body.dark-mode .unit {
+      color: #a0aec0;
+    }
+    
+    .notes {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 6px;
+    }
+    
+    body.dark-mode .notes {
+      background-color: #744210;
+      border-left-color: #f59e0b;
+    }
+    
+    .notes h4 {
+      color: #7c4d08;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    
+    body.dark-mode .notes h4 {
+      color: #fff3cd;
+    }
+    
+    .notes ul {
+      margin: 10px 0;
+      color: #7c4d08;
+    }
+    
+    body.dark-mode .notes ul {
+      color: #fff3cd;
+    }
+    
+    .notes li {
+      margin-bottom: 8px;
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1a365d;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    
+    body.dark-mode .theme-toggle {
+      background: #2d3748;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      background: #2c5282;
+    }
+    
+    body.dark-mode .theme-toggle:hover {
+      background: #4a5568;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📊 Reference Ranges</h1>
+      <p>Comprehensive reference ranges for laboratory tests and vital signs.</p>
+    </header>
+
+    <div class="filters">
+      <div class="filter-group">
+        <label for="search">Search Tests</label>
+        <input type="text" id="search" placeholder="Search by test name or keyword">
+      </div>
+      
+      <div class="filter-group">
+        <label for="category">Category</label>
+        <select id="category">
+          <option value="all">All Categories</option>
+          <option value="hematology">Hematology</option>
+          <option value="chemistry">Chemistry</option>
+          <option value="endocrine">Endocrine</option>
+          <option value="liver">Liver Function</option>
+          <option value="renal">Renal Function</option>
+          <option value="lipid">Lipid Panel</option>
+          <option value="vitamin">Vitamins & Minerals</option>
+        </select>
+      </div>
+      
+      <div style="display: flex; align-items: flex-end;">
+        <button class="btn" id="download-reference">Download PDF</button>
+      </div>
+    </div>
+
+    <div class="reference-tabs">
+      <div class="reference-tab active" data-tab="hematology">Hematology</div>
+      <div class="reference-tab" data-tab="chemistry">Chemistry</div>
+      <div class="reference-tab" data-tab="endocrine">Endocrine</div>
+      <div class="reference-tab" data-tab="liver">Liver Function</div>
+      <div class="reference-tab" data-tab="renal">Renal Function</div>
+      <div class="reference-tab" data-tab="lipid">Lipid Panel</div>
+      <div class="reference-tab" data-tab="vitamin">Vitamins & Minerals</div>
+    </div>
+
+    <div id="hematology" class="reference-content active">
+      <div class="category-header">
+        <h3 class="category-title">Hematology</h3>
+        <p class="category-description">Complete blood count and related hematological parameters.</p>
+      </div>
+      
+      <table class="reference-table">
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Normal Range</th>
+            <th>Unit</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>White Blood Cell Count (WBC)</td>
+            <td>4.5 - 11.0</td>
+            <td class="unit">10³/μL</td>
+            <td>Elevated in infection, inflammation, leukemia</td>
+          </tr>
+          <tr>
+            <td>Red Blood Cell Count (RBC)</td>
+            <td>4.2 - 6.1</td>
+            <td class="unit">million/μL</td>
+            <td>Lower in females; elevated at high altitudes</td>
+          </tr>
+          <tr>
+            <td>Hemoglobin</td>
+            <td>12.0 - 16.0</td>
+            <td class="unit">g/dL</td>
+            <td>Lower in females; pregnancy causes physiological decrease</td>
+          </tr>
+          <tr>
+            <td>Hematocrit (Hct)</td>
+            <td>36 - 50</td>
+            <td class="unit">%</td>
+            <td>Correlates with hemoglobin; affected by hydration status</td>
+          </tr>
+          <tr>
+            <td>Mean Corpuscular Volume (MCV)</td>
+            <td>80 - 100</td>
+            <td class="unit">fL</td>
+            <td>Microcytic anemia if low; macrocytic if high</td>
+          </tr>
+          <tr>
+            <td>Platelet Count</td>
+            <td>150 - 450</td>
+            <td class="unit">10³/μL</td>
+            <td>Thrombocytopenia if <150; thrombocytosis if >450</td>
+          </tr>
+          <tr>
+            <td>Erythrocyte Sedimentation Rate (ESR)</td>
+            <td>0 - 20</td>
+            <td class="unit">mm/hr</td>
+            <td>Non-specific marker of inflammation; increases with age</td>
+          </tr>
+          <tr>
+            <td>C-reactive Protein (CRP)</td>
+            <td>0 - 5</td>
+            <td class="unit">mg/L</td>
+            <td>Acute phase reactant; elevated in inflammation and infection</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="notes">
+        <h4>Important Notes</h4>
+        <ul>
+          <li>Reference ranges may vary slightly between laboratories based on methodology and population</li>
+          <li>Age, sex, and ethnicity can affect normal values for some parameters</li>
+          <li>Clinical interpretation should consider the patient's overall clinical picture</li>
+          <li>Some values may be affected by recent meals, medications, or activity level</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="chemistry" class="reference-content">
+      <div class="category-header">
+        <h3 class="category-title">Chemistry</h3>
+        <p class="category-description">Basic metabolic panel and other common chemistry tests.</p>
+      </div>
+      
+      <table class="reference-table">
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Normal Range</th>
+            <th>Unit</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Glucose</td>
+            <td>70 - 140</td>
+            <td class="unit">mg/dL</td>
+            <td>Fasting: 70-100 mg/dL; postprandial higher</td>
+          </tr>
+          <tr>
+            <td>BUN (Blood Urea Nitrogen)</td>
+            <td>7 - 20</td>
+            <td class="unit">mg/dL</td>
+            <td>Increases with dehydration, high protein diet, renal impairment</td>
+          </tr>
+          <tr>
+            <td>Creatinine</td>
+            <td>0.6 - 1.3</td>
+            <td class="unit">mg/dL</td>
+            <td>Higher in males; muscle mass affects levels</td>
+          </tr>
+          <tr>
+            <td>Sodium</td>
+            <td>135 - 145</td>
+            <td class="unit">mEq/L</td>
+            <td>Hyponatremia if <135; hypernatremia if >145</td>
+          </tr>
+          <tr>
+            <td>Potassium</td>
+            <td>3.5 - 5.1</td>
+            <td class="unit">mEq/L</td>
+            <td>Life-threatening if <3.0 or >6.0; affected by medications</td>
+          </tr>
+          <tr>
+            <td>Chloride</td>
+            <td>98 - 107</td>
+            <td class="unit">mEq/L</td>
+            <td>Usually follows sodium; affected by acid-base balance</td>
+          </tr>
+          <tr>
+            <td>Calcium</td>
+            <td>8.5 - 10.5</td>
+            <td class="unit">mg/dL</td>
+            <td>Ionized calcium is physiologically active form</td>
+          </tr>
+          <tr>
+            <td>Uric Acid</td>
+            <td>3.5 - 7.2</td>
+            <td class="unit">mg/dL</td>
+            <td>Higher in males; associated with gout and kidney stones</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="notes">
+        <h4>Important Notes</h4>
+        <ul>
+          <li>Fasting is required for accurate glucose and lipid measurements</li>
+          <li>Hydration status can significantly affect electrolyte concentrations</li>
+          <li>Some medications can alter chemistry panel results</li>
+          <li>Albumin levels affect calcium interpretation (corrected calcium)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="endocrine" class="reference-content">
+      <div class="category-header">
+        <h3 class="category-title">Endocrine</h3>
+        <p class="category-description">Hormone levels and endocrine function tests.</p>
+      </div>
+      
+      <table class="reference-table">
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Normal Range</th>
+            <th>Unit</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>TSH (Thyroid Stimulating Hormone)</td>
+            <td>0.4 - 4.0</td>
+            <td class="unit">μIU/mL</td>
+            <td>Primary test for thyroid function; inverse to T4</td>
+          </tr>
+          <tr>
+            <td>Free T4 (FT4)</td>
+            <td>0.7 - 1.9</td>
+            <td class="unit">ng/dL</td>
+            <td>Measures biologically active thyroid hormone</td>
+          </tr>
+          <tr>
+            <td>HbA1c</td>
+            <td>4.0 - 5.6</td>
+            <td class="unit">%</td>
+            <td>Reflects average blood glucose over 2-3 months</td>
+          </tr>
+          <tr>
+            <td>Vitamin D (25-OH)</td>
+            <td>20 - 50</td>
+            <td class="unit">ng/mL</td>
+            <td>Deficiency: <20; insufficiency: 20-29; sufficient: 30-50</td>
+          </tr>
+          <tr>
+            <td>Vitamin B12</td>
+            <td>200 - 900</td>
+            <td class="unit">pg/mL</td>
+            <td>Deficiency can cause megaloblastic anemia and neurological symptoms</td>
+          </tr>
+          <tr>
+            <td>Ferritin</td>
+            <td>12 - 300</td>
+            <td class="unit">ng/mL</td>
+            <td>Best indicator of iron stores; acute phase reactant</td>
+          </tr>
+          <tr>
+            <td>Iron</td>
+            <td>60 - 170</td>
+            <td class="unit">μg/dL</td>
+            <td>Varies with time of day; affected by recent iron intake</td>
+          </tr>
+          <tr>
+            <td>Total Testosterone (Male)</td>
+            <td>300 - 1000</td>
+            <td class="unit">ng/dL</td>
+            <td>Levels decline with age; morning levels are highest</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="notes">
+        <h4>Important Notes</h4>
+        <ul>
+          <li>Hormone levels can have diurnal variation (e.g., cortisol, testosterone)</li>
+          <li>Many hormones are affected by other medications and health conditions</li>
+          <li>Reference ranges may differ for children, pregnant women, and elderly</li>
+          <li>Some hormone tests require specific timing (e.g., morning cortisol)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="liver" class="reference-content">
+      <div class="category-header">
+        <h3 class="category-title">Liver Function</h3>
+        <p class="category-description">Liver enzyme and function tests.</p>
+      </div>
+      
+      <table class="reference-table">
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Normal Range</th>
+            <th>Unit</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Alanine Aminotransferase (ALT)</td>
+            <td>7 - 56</td>
+            <td class="unit">U/L</td>
+            <td>More specific for liver than AST; elevated in hepatitis</td>
+          </tr>
+          <tr>
+            <td>Aspartate Aminotransferase (AST)</td>
+            <td>10 - 40</td>
+            <td class="unit">U/L</td>
+            <td>Also found in heart, muscle; AST:ALT ratio >1 suggests alcoholic liver disease</td>
+          </tr>
+          <tr>
+            <td>Alkaline Phosphatase (ALP)</td>
+            <td>44 - 147</td>
+            <td class="unit">U/L</td>
+            <td>Elevated in bone disease and biliary obstruction</td>
+          </tr>
+          <tr>
+            <td>Gamma-Glutamyl Transferase (GGT)</td>
+            <td>9 - 48</td>
+            <td class="unit">U/L</td>
+            <td>More sensitive than ALP for alcohol use and biliary disease</td>
+          </tr>
+          <tr>
+            <td>Total Bilirubin</td>
+            <td>0.1 - 1.2</td>
+            <td class="unit">mg/dL</td>
+            <td>Conjugated (direct) and unconjugated (indirect) fractions</td>
+          </tr>
+          <tr>
+            <td>Albumin</td>
+            <td>3.5 - 5.0</td>
+            <td class="unit">g/dL</td>
+            <td>Decreased in liver disease, malnutrition, nephrotic syndrome</td>
+          </tr>
+          <tr>
+            <td>Total Protein</td>
+            <td>6.0 - 8.0</td>
+            <td class="unit">g/dL</td>
+            <td>Includes albumin and globulins</td>
+          </tr>
+          <tr>
+            <td>Prothrombin Time (PT)</td>
+            <td>11 - 13.5</td>
+            <td class="unit">seconds</td>
+            <td>Measures extrinsic coagulation pathway; INR standardizes results</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="notes">
+        <h4>Important Notes</h4>
+        <ul>
+          <li>Liver enzymes may be mildly elevated in non-alcoholic fatty liver disease</li>
+          <li>ALP can be elevated in growing children and during pregnancy</li>
+          <li>Bilirubin levels can be affected by hemolysis and Gilbert's syndrome</li>
+          <li>Albumin has a long half-life (~20 days), so changes are slow</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="renal" class="reference-content">
+      <div class="category-header">
+        <h3 class="category-title">Renal Function</h3>
+        <p class="category-description">Kidney function and electrolyte tests.</p>
+      </div>
+      
+      <table class="reference-table">
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Normal Range</th>
+            <th>Unit</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>BUN (Blood Urea Nitrogen)</td>
+            <td>7 - 20</td>
+            <td class="unit">mg/dL</td>
+            <td>Increases with dehydration, high protein diet, renal impairment</td>
+          </tr>
+          <tr>
+            <td>Creatinine</td>
+            <td>0.6 - 1.3</td>
+            <td class="unit">mg/dL</td>
+            <td>Higher in males; muscle mass affects levels</td>
+          </tr>
+          <tr>
+            <td>eGFR (Estimated Glomerular Filtration Rate)</td>
+            <td>>90</td>
+            <td class="unit">mL/min/1.73m²</td>
+            <td>Calculated from creatinine, age, sex, race; staging of CKD</td>
+          </tr>
+          <tr>
+            <td>Uric Acid</td>
+            <td>3.5 - 7.2</td>
+            <td class="unit">mg/dL</td>
+            <td>Higher in males; associated with gout and kidney stones</td>
+          </tr>
+          <tr>
+            <td>Phosphorus</td>
+            <td>2.5 - 4.5</td>
+            <td class="unit">mg/dL</td>
+            <td>Regulated by PTH, vitamin D, and kidneys</td>
+          </tr>
+          <tr>
+            <td>Calcium</td>
+            <td>8.5 - 10.5</td>
+            <td class="unit">mg/dL</td>
+            <td>Ionized calcium is physiologically active form</td>
+          </tr>
+          <tr>
+            <td>Urine Microalbumin/Creatinine Ratio</td>
+            <td><30</td>
+            <td class="unit">mg/g</td>
+            <td>Early marker of diabetic nephropathy</td>
+          </tr>
+          <tr>
+            <td>Serum Osmolality</td>
+            <td>275 - 295</td>
+            <td class="unit">mOsm/kg</td>
+            <td>Calculated from sodium, glucose, BUN</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="notes">
+        <h4>Important Notes</h4>
+        <ul>
+          <li>eGFR is more accurate than creatinine alone for assessing kidney function</li>
+          <li>CKD staging: Stage 1 (>90), Stage 2 (60-89), Stage 3 (30-59), Stage 4 (15-29), Stage 5 (<15)</li>
+          <li>Urine albumin-to-creatinine ratio is preferred over dipstick for microalbuminuria</li>
+          <li>Hydration status significantly affects BUN and creatinine levels</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="lipid" class="reference-content">
+      <div class="category-header">
+        <h3 class="category-title">Lipid Panel</h3>
+        <p class="category-description">Cholesterol and triglyceride measurements.</p>
+      </div>
+      
+      <table class="reference-table">
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Normal Range</th>
+            <th>Unit</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Total Cholesterol</td>
+            <td><200</td>
+            <td class="unit">mg/dL</td>
+            <td>Desirable: <200; borderline: 200-239; high: ≥240</td>
+          </tr>
+          <tr>
+            <td>HDL Cholesterol</td>
+            <td>40 - 60</td>
+            <td class="unit">mg/dL</td>
+            <td>"Good" cholesterol; higher is better; <40 is a risk factor</td>
+          </tr>
+          <tr>
+            <td>LDL Cholesterol</td>
+            <td><100</td>
+            <td class="unit">mg/dL</td>
+            <td>"Bad" cholesterol; optimal: <100; near optimal: 100-129</td>
+          </tr>
+          <tr>
+            <td>Triglycerides</td>
+            <td><150</td>
+            <td class="unit">mg/dL</td>
+            <td>Normal: <150; borderline: 150-199; high: 200-499</td>
+          </tr>
+          <tr>
+            <td>Non-HDL Cholesterol</td>
+            <td><130</td>
+            <td class="unit">mg/dL</td>
+            <td>Total cholesterol minus HDL; secondary target in some guidelines</td>
+          </tr>
+          <tr>
+            <td>Cholesterol/HDL Ratio</td>
+            <td><5.0</td>
+            <td class="unit">ratio</td>
+            <td>Lower ratio indicates lower cardiovascular risk</td>
+          </tr>
+          <tr>
+            <td>LDL/HDL Ratio</td>
+            <td><3.0</td>
+            <td class="unit">ratio</td>
+            <td>Lower ratio indicates more favorable lipid profile</td>
+          </tr>
+          <tr>
+            <td>VLDL Cholesterol</td>
+            <td>5 - 40</td>
+            <td class="unit">mg/dL</td>
+            <td>Calculated as triglycerides ÷ 5; carries triglycerides</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="notes">
+        <h4>Important Notes</h4>
+        <ul>
+          <li>Fasting (9-12 hours) required for accurate triglyceride and LDL measurements</li>
+          <li>LDL is usually calculated (Friedewald equation); direct measurement if triglycerides >400</li>
+          <li>Cardiovascular risk assessment considers multiple factors beyond lipids</li>
+          <li>Desired LDL targets vary based on overall cardiovascular risk</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="vitamin" class="reference-content">
+      <div class="category-header">
+        <h3 class="category-title">Vitamins & Minerals</h3>
+        <p class="category-description">Essential vitamins, minerals, and trace elements.</p>
+      </div>
+      
+      <table class="reference-table">
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Normal Range</th>
+            <th>Unit</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Vitamin D (25-OH)</td>
+            <td>20 - 50</td>
+            <td class="unit">ng/mL</td>
+            <td>Deficiency: <20; insufficiency: 20-29; sufficient: 30-50</td>
+          </tr>
+          <tr>
+            <td>Vitamin B12</td>
+            <td>200 - 900</td>
+            <td class="unit">pg/mL</td>
+            <td>Deficiency can cause megaloblastic anemia and neurological symptoms</td>
+          </tr>
+          <tr>
+            <td>Folate (Folic Acid)</td>
+            <td>3 - 20</td>
+            <td class="unit">ng/mL</td>
+            <td>Deficiency causes megaloblastic anemia; important in pregnancy</td>
+          </tr>
+          <tr>
+            <td>Iron</td>
+            <td>60 - 170</td>
+            <td class="unit">μg/dL</td>
+            <td>Varies with time of day; affected by recent iron intake</td>
+          </tr>
+          <tr>
+            <td>Ferritin</td>
+            <td>12 - 300</td>
+            <td class="unit">ng/mL</td>
+            <td>Best indicator of iron stores; acute phase reactant</td>
+          </tr>
+          <tr>
+            <td>Zinc</td>
+            <td>70 - 110</td>
+            <td class="unit">μg/dL</td>
+            <td>Deficiency associated with impaired immunity and wound healing</td>
+          </tr>
+          <tr>
+            <td>Magnesium</td>
+            <td>1.7 - 2.2</td>
+            <td class="unit">mg/dL</td>
+            <td>Ionized magnesium is physiologically active form</td>
+          </tr>
+          <tr>
+            <td>Selenium</td>
+            <td>70 - 150</td>
+            <td class="unit">μg/L</td>
+            <td>Antioxidant; component of glutathione peroxidase</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div class="notes">
+        <h4>Important Notes</h4>
+        <ul>
+          <li>Vitamin D levels vary with season, sun exposure, and skin pigmentation</li>
+          <li>B12 and folate deficiencies can have similar hematological presentations</li>
+          <li>Ferritin is an acute phase reactant and may be elevated in inflammation</li>
+          <li>Red blood cell magnesium may be more accurate than serum in some cases</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Toggle Button -->
+  <button id="themeToggle" class="theme-toggle" title="Toggle Dark Mode">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <script>
+    // Tab functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabs = document.querySelectorAll('.reference-tab');
+      const tabContents = document.querySelectorAll('.reference-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          // Remove active class from all tabs and contents
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(content => content.classList.remove('active'));
+          
+          // Add active class to clicked tab and corresponding content
+          this.classList.add('active');
+          const tabId = this.getAttribute('data-tab');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+      
+      // Dark mode functionality
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      
+      // Check for saved theme preference
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        themeToggle.classList.add('dark');
+      }
+      
+      // Toggle theme
+      themeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+        
+        if (body.classList.contains('dark-mode')) {
+          localStorage.setItem('theme', 'dark');
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          themeToggle.classList.add('dark');
+        } else {
+          localStorage.setItem('theme', 'light');
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          themeToggle.classList.remove('dark');
+        }
+      });
+
+      // Download reference button
+      document.getElementById('download-reference').addEventListener('click', function() {
+        // In a real app, this would download a PDF of the reference ranges
+        alert('Downloading reference ranges PDF...');
+      });
+
+      // Search functionality
+      document.getElementById('search').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.reference-table tbody tr');
+        
+        rows.forEach(row => {
+          const cells = row.getElementsByTagName('td');
+          let found = false;
+          
+          for (let i = 0; i < cells.length; i++) {
+            if (cells[i].textContent.toLowerCase().includes(searchTerm)) {
+              found = true;
+              break;
+            }
+          }
+          
+          row.style.display = found ? '' : 'none';
+        });
+      });
+    });
+  </script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
