@@ -1,5 +1,6 @@
 # 🩺 Smart Medical Report Analyzer  
 
+![Screenshot](https://github.com/Samara856/Medical_Report_Analyzer/blob/master/Medical%20Report%20Analyzer%20.png)
 
 
 [![Flask](https://img.shields.io/badge/Flask-2.0+-blue.svg)](https://flask.palletsprojects.com/)  
