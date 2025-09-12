@@ -43,7 +43,7 @@ Follow these steps to run the project locally:
 ### 1️⃣ Clone the Repository  
 
 bash
-git clone https://github.com/Samara856/smart-medical-report-analyzer.git
+git clone https://github.com/Samara856/[smart-medical-report-analyzer](https://github.com/Samara856/Medical_Report_Analyzer)
 cd smart-medical-report-analyzer
 
 2️⃣ Create Virtual Environment & Install Dependencies
