@@ -99,7 +99,7 @@ pip install -r requirements.txt
 bash
 python app.py
 
-##🔮 Future Improvements
+## 🔮 Future Improvements
 
 🤖 Machine Learning model for predictive medical analysis
 
