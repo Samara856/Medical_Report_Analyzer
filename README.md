@@ -1,6 +1,5 @@
 # 🩺 Smart Medical Report Analyzer  
 
-![Screenshot](https://github.com/Samara856/Medical_Report_Analyzer/blob/master/Medical%20Report%20Analyzer%20.png)
 <p align="center">
   <img src="https://github.com/Samara856/Medical_Report_Analyzer/blob/master/Medical%20Report%20Analyzer%20.png" alt="Logo" width="200" style="border-radius:15px;"/>
 </p>
