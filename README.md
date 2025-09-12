@@ -10,11 +10,18 @@
 ---
 
 ## 📖 About the Project  
-**Smart Medical Report Analyzer** is a lightweight and intelligent web application designed to make medical reports easy to understand.  
-Many patients find it difficult to interpret lab values in their reports — this tool automatically extracts results using **OCR (Optical Character Recognition)** and compares them with reference ranges to provide clear insights.  
 
-✨ With just a simple upload, users can instantly know whether their test results are **Normal, High, or Low**.  
-It saves time, reduces confusion, and empowers patients to take better care of their health.  
+**Smart Medical Report Analyzer** is a modern web application designed to help patients and healthcare professionals quickly interpret medical lab reports.  
+Manually reading lab results can be confusing and time-consuming. This app leverages **OCR (Optical Character Recognition)** to extract data from scanned reports or images and provides instant insights about test results.  
+
+Key benefits:  
+- Automatically identifies whether lab values are **Normal, High, or Low**  
+- Reduces human error in interpreting reports  
+- Provides a user-friendly interface for both patients and medical staff  
+- Saves time and helps users make informed health decisions  
+
+By combining OCR with intelligent analysis, this tool makes understanding medical reports faster, simpler, and more accurate.
+
 
 ---
 
@@ -29,10 +36,30 @@ It saves time, reduces confusion, and empowers patients to take better care of t
 ---
 
 ## 🛠️ Tech Stack  
-- **Backend**: Python (Flask)  
-- **OCR Engine**: Tesseract OCR  
-- **Frontend**: HTML, CSS, JavaScript (Jinja2 templates)  
-- **Deployment**: Render  
+
+**Backend:**  
+- Python 3.9+  
+- Flask (Web Framework)  
+
+**OCR Engine:**  
+- Tesseract OCR (Text extraction from images/PDFs)  
+
+**Frontend:**  
+- HTML5, CSS3  
+- JavaScript  
+- Jinja2 Templates (for dynamic content rendering)  
+
+**Database (Optional/Future):**  
+- SQLite / PostgreSQL  
+
+**Deployment:**  
+- Render.com (Cloud Hosting)  
+
+**Development Tools:**  
+- Git & GitHub  
+- Visual Studio Code / PyCharm  
+- Postman (for API testing, optional)  
+ 
 
 ---
 
@@ -45,7 +72,7 @@ Follow these steps to run the project locally:
 git clone :[ https://github.com/Samara856/[smart-medical-report-analyzer](https://github.com/Samara856/Medical_Report_Analyzer)](https://github.com/Samara856/Medical_Report_Analyzer.git)
 
 
-###2️⃣ Create Virtual Environment & Install Dependencies
+### 2️⃣ Create Virtual Environment & Install Dependencies
 
 bash
 python -m venv venv
@@ -58,7 +85,7 @@ venv\Scripts\activate
 
 pip install -r requirements.txt
 
-###3️⃣ Run the App
+### 3️⃣ Run the App
 
 bash
 python app.py
