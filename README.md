@@ -5,8 +5,6 @@
 </p>
 
 
-
-
 [![Flask](https://img.shields.io/badge/Flask-2.0+-blue.svg)](https://flask.palletsprojects.com/)  
 [![Python](https://img.shields.io/badge/Python-3.9+-yellow.svg)](https://www.python.org/)  
 [![OCR](https://img.shields.io/badge/OCR-Tesseract-green.svg)](https://github.com/tesseract-ocr/tesseract)  
@@ -29,6 +27,10 @@ Key benefits:
 
 By combining OCR with intelligent analysis, this tool makes understanding medical reports faster, simpler, and more accurate.
 
+### Here is the overview of the website
+![Screenshot](https://github.com/Samara856/Medical_Report_Analyzer/blob/master/Medical%20Report%20Analyzer%20Dashboard.png)
+![Screenshot](https://github.com/Samara856/Medical_Report_Analyzer/blob/master/Medical%20Report%20Analyzer%20Dashboard1.png)
+![Screenshot](https://github.com/Samara856/Medical_Report_Analyzer/blob/master/Medical%20Report%20Analyzer%20Dashboard2.png)
 
 ---
 
