@@ -45,25 +45,25 @@ Follow these steps to run the project locally:
 git clone :[ https://github.com/Samara856/[smart-medical-report-analyzer](https://github.com/Samara856/Medical_Report_Analyzer)](https://github.com/Samara856/Medical_Report_Analyzer.git)
 
 
-2️⃣ Create Virtual Environment & Install Dependencies
+###2️⃣ Create Virtual Environment & Install Dependencies
 
 bash
 python -m venv venv
 
-# On Linux/Mac
+#### On Linux/Mac
 source venv/bin/activate
 
-# On Windows
+#### On Windows
 venv\Scripts\activate
 
 pip install -r requirements.txt
 
-3️⃣ Run the App
+###3️⃣ Run the App
 
 bash
 python app.py
 
-🔮 Future Improvements
+##🔮 Future Improvements
 
 🤖 Machine Learning model for predictive medical analysis
 ☁️ Cloud storage for past medical records
