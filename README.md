@@ -1,6 +1,5 @@
 # 🩺 Smart Medical Report Analyzer  
 
-![Image Alt] [![OCR](https://img.shields.io/badge/OCR-Tesseract-green.svg)](https://github.com/tesseract-ocr/tesseract)  
 
 
 [![Flask](https://img.shields.io/badge/Flask-2.0+-blue.svg)](https://flask.palletsprojects.com/)  
