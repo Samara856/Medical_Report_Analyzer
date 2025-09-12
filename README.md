@@ -102,5 +102,7 @@ python app.py
 ##🔮 Future Improvements
 
 🤖 Machine Learning model for predictive medical analysis
+
 ☁️ Cloud storage for past medical records
+
 📱 Dedicated mobile app for patients
