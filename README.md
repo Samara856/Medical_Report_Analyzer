@@ -1,5 +1,7 @@
 # 🩺 Smart Medical Report Analyzer  
 
+![Image Alt](image_url)https://github.com/Samara856/Medical_Report_Analyzer/blob/62cd216377660a1a3420a5a36b52d1f54d30f3e4/Medical%20Report%20Analyzer%20.png
+
 [![Flask](https://img.shields.io/badge/Flask-2.0+-blue.svg)](https://flask.palletsprojects.com/)  
 [![Python](https://img.shields.io/badge/Python-3.9+-yellow.svg)](https://www.python.org/)  
 [![OCR](https://img.shields.io/badge/OCR-Tesseract-green.svg)](https://github.com/tesseract-ocr/tesseract)  
